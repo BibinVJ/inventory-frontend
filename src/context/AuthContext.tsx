@@ -1,87 +1,74 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  getToken,
+  storeToken,
+  logout as logoutService,
+} from "../services/AuthService";
+import axios from "axios";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  status: string;
-  status_updated_at: string | null;
-  is_admin: boolean;
-  role_names: string[];
-  permissions: string[];
-  profile_image: string | null;
-  phone: string | null;
-  phone_verified_at: string | null;
-}
-
-interface Token {
-  access_token: string;
-  expires_in: number;
-}
+type User = any;
 
 interface AuthContextType {
   user: User | null;
-  token: Token | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    stayLoggedIn: boolean
+  ) => Promise<any>;
   logout: () => void;
-  isAuthenticated: boolean;
+  loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
+export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<Token | null>(null);
+  const [loading, setLoading] = useState(true); // for refresh check
 
   useEffect(() => {
-    // Load auth state from localStorage on mount
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(JSON.parse(storedToken));
+    const token = getToken();
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      // Fetch the current user
+      axios
+        .get(`${import.meta.env.VITE_API_BASE_URL}/profile`)
+        .then((res) => {
+          setUser(res.data.results);
+        })
+        .catch(() => {
+          logoutService();
+          setUser(null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("password", password);
-
-    const response = await fetch(\`\${import.meta.env.VITE_API_BASE_URL}/api/login\`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Login failed");
-    }
-
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(data.message || "Login error");
-    }
-
+  const login = async (
+    email: string,
+    password: string,
+    stayLoggedIn: boolean
+  ) => {
+    const data = await import("../services/AuthService").then((mod) =>
+      mod.login(email, password)
+    );
+    const token = data.results.token.access_token;
+    storeToken(token, stayLoggedIn);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     setUser(data.results.user);
-    setToken(data.results.token);
-
-    localStorage.setItem("user", JSON.stringify(data.results.user));
-    localStorage.setItem("token", JSON.stringify(data.results.token));
+    return data.results.user;
   };
 
   const logout = () => {
+    logoutService();
     setUser(null);
-    setToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
   };
 
-  const isAuthenticated = !!token;
-
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -89,8 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context)
     throw new Error("useAuth must be used within an AuthProvider");
-  }
   return context;
 };

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { EyeIcon, EyeCloseIcon } from "../../icons";
-import { toast } from "sonner";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Checkbox from "../form/input/Checkbox";
@@ -14,7 +13,6 @@ import XIcon from "../../icons/XIcon";
 
 export default function SignInForm() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +23,6 @@ export default function SignInForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    setErrors({ ...errors, [name]: "" });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,32 +33,7 @@ export default function SignInForm() {
       await login(form.email, form.password, stayLoggedIn);
       navigate("/");
     } catch (err: any) {
-      let message = "Something went wrong. Please try again.";
-      let statusCode = null;
-
-      if (err.response) {
-        // Server responded with a status code out of 2xx range
-        statusCode = err.response.status;
-        message = err.response.data?.message || `Error ${statusCode}`;
-        setErrors({
-          email: err.response.data?.errors?.email || " ",
-          password: err.response.data?.errors?.password || " ",
-        });
-      } else if (err.request) {
-        // Request was made but no response received
-        message = "Server is unreachable.";
-      } else {
-        // Something else happened (like a JS error)
-        message = err.message || "Unexpected error occurred.";
-      }
-
-      console.error("Login failed:", {
-        message,
-        statusCode,
-        raw: err,
-      });
-
-      toast.error(message);
+      // err
     } finally {
       setLoading(false);
     }
@@ -103,8 +75,6 @@ export default function SignInForm() {
                   onChange={handleChange}
                   placeholder="Email"
                   autoComplete="email"
-                  error={!!errors.email}
-                  hint={errors.email}
                 />
               </div>
               <div>
@@ -118,8 +88,6 @@ export default function SignInForm() {
                   onChange={handleChange}
                   placeholder="Password"
                   autoComplete="current-password"
-                  error={!!errors.password}
-                  hint={errors.password}
                   rightIcon={
                     showPassword ? (
                       <EyeIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />

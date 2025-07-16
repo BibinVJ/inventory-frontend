@@ -16,8 +16,8 @@ export default function UserInfoCard() {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-            Personal Information
-          </h4>
+          Personal Information
+        </h4>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
             <div>
@@ -27,18 +27,18 @@ export default function UserInfoCard() {
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                 Musharof
               </p>
-            </div>
+      </div>
 
-            <div>
+          <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Last Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                 Chowdhury
               </p>
-            </div>
+          </div>
 
-            <div>
+          <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Email address
               </p>
@@ -102,10 +102,10 @@ export default function UserInfoCard() {
           </div>
           <form className="flex flex-col">
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div>
+          <div>
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Social Links
-                </h5>
+            </h5>
 
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
@@ -132,9 +132,9 @@ export default function UserInfoCard() {
                   <div>
                     <Label>Instagram</Label>
                     <Input type="text" value="https://instagram.com/PimjoHQ" />
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </div>
               <div className="mt-7">
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Personal Information
@@ -174,8 +174,8 @@ export default function UserInfoCard() {
               </Button>
               <Button size="sm" onClick={handleSave}>
                 Save Changes
-              </Button>
-            </div>
+        </Button>
+      </div>
           </form>
         </div>
       </Modal>

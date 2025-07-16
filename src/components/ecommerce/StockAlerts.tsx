@@ -6,10 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import Badge from "../ui/badge/Badge";
 
 interface TopItem {
   id: number;
-    sku: string;
+  sku: string;
   name: string;
   stock_remaining: number;
 }
@@ -17,10 +18,11 @@ interface TopItem {
 interface Props {
   items: TopItem[];
   title?: string;
+  color?: "success" | "error" | "warning" | "secondary";
 }
 
-export default function StockAlerts({ items, title = "Stock Alert" }: Props) {
-      if (!items || items.length === 0) {
+export default function StockAlerts({ items, title = "Stock Alert", color = "error" }: Props) {
+  if (!items || items.length === 0) {
     return (
       <TableSection title={title}>
         <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -29,7 +31,7 @@ export default function StockAlerts({ items, title = "Stock Alert" }: Props) {
       </TableSection>
     );
   }
-  
+
   return (
     <TableSection title={title}>
       <Table>
@@ -54,9 +56,6 @@ export default function StockAlerts({ items, title = "Stock Alert" }: Props) {
             >
               Remaining Stock Qty
             </TableCell>
-            {
-                
-            }
           </TableRow>
         </TableHeader>
 
@@ -71,7 +70,9 @@ export default function StockAlerts({ items, title = "Stock Alert" }: Props) {
                 {item.name}
               </TableCell>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                {item.stock_remaining}
+                <Badge size="sm" color={color}>
+                  {item.stock_remaining}
+                </Badge>
               </TableCell>
             </TableRow>
           ))}

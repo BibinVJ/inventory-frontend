@@ -1,12 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  getToken,
-  storeToken,
+  getUser,
+  storeUser,
   logout as logoutService,
+  login as loginService,
 } from "../services/AuthService";
-import axios from "axios";
+import api from "../services/api";
 
-type User = any;
+type User = {
+  id: number;
+  name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+};
 
 interface AuthContextType {
   user: User | null;
@@ -17,34 +30,23 @@ interface AuthContextType {
   ) => Promise<any>;
   logout: () => void;
   loading: boolean;
+  fetchProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // for refresh check
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      // Fetch the current user
-      axios
-        .get(`${import.meta.env.VITE_API_BASE_URL}/profile`)
-        .then((res) => {
-          setUser(res.data.results);
-        })
-        .catch(() => {
-          logoutService();
-          setUser(null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+    const storedUser = getUser();
+    if (storedUser && storedUser.results.token.access_token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${storedUser.results.token.access_token}`;
+      setUser(storedUser.results.user);
+      fetchProfile();
     }
+    setLoading(false);
   }, []);
 
   const login = async (
@@ -52,23 +54,29 @@ export const AuthProvider = ({ children }: any) => {
     password: string,
     stayLoggedIn: boolean
   ) => {
-    const data = await import("../services/AuthService").then((mod) =>
-      mod.login(email, password)
-    );
-    const token = data.results.token.access_token;
-    storeToken(token, stayLoggedIn);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    const data = await loginService(email, password);
+    storeUser(data, stayLoggedIn);
+    api.defaults.headers.common["Authorization"] = `Bearer ${data.results.token.access_token}`;
     setUser(data.results.user);
     return data.results.user;
   };
 
-  const logout = () => {
-    logoutService();
+  const logout = async () => {
+    await logoutService();
     setUser(null);
   };
 
+  const fetchProfile = async () => {
+    try {
+      const { data } = await api.get("/profile");
+      setUser(data.results);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, fetchProfile }}>
       {children}
     </AuthContext.Provider>
   );

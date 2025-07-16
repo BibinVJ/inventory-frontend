@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
 import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-// import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
-// import RecentOrders from "../../components/ecommerce/RecentOrders";
-// import DemographicCard from "../../components/ecommerce/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
 import { getDashboardData } from "../../services/DashboardService";
 import TopItems from "../../components/ecommerce/TopItems";
@@ -31,79 +28,56 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="text-center text-gray-500">Loading dashboard...</div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center text-gray-500">Loading dashboard...</div>
+      </div>
     );
   }
 
   return (
     <>
       <PageMeta
-        title="React.js Ecommerce Dashboard | TailAdmin - React.js Admin Dashboard Template"
-        description="This is React.js Ecommerce Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="Ecommerce Dashboard | Pharmacy Manager"
+        description="This is the ecommerce dashboard page for Pharmacy Manager"
       />
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <EcommerceMetrics data={data?.metrics} />
+      <div className="p-4 space-y-6 md:p-6 2xl:p-10">
+        {/* Top Row: Key Metrics */}
+        <EcommerceMetrics data={data?.metrics} />
 
-          <MonthlySalesChart data={data?.charts?.sales} />
-        </div>
+        {/* Main Content Area */}
+        <div className="grid grid-cols-12 gap-4 md:gap-6">
+          {/* Left Side: Main Charts and Tables */}
+          <div className="col-span-12 space-y-6 xl:col-span-8">
+            <MonthlySalesChart data={data?.charts?.sales} />
+            <StatisticsChart data={data?.charts} />
+            <CustomersTable title="Top Customers" customers={data?.customers?.best_customers} />
+          </div>
 
-                {/* top customers */}
-        <div className="col-span-12 xl:col-span-5">
-          <CustomersTable title="Top Customers" customers={data?.customers?.best_customers} />
+          {/* Right Side: Alerts and Lists */}
+          <div className="col-span-12 space-y-6 xl:col-span-4">
+            <StockAlerts
+              title="Out of Stock Items"
+              items={data?.stock_alerts?.out_of_stock_items}
+              color="error"
+            />
+            <StockAlerts
+              title="Low Stock Items"
+              items={data?.stock_alerts?.low_stock_items}
+              color="warning"
+            />
+            <ExpiryItems items={data?.stock_alerts?.expiring_items} />
+            <TopItems title="Top Sold Items" items={data?.top_items?.sold} />
+            <TopItems
+              title="Top Purchased Items"
+              items={data?.top_items?.purchased}
+            />
+            <StockAlerts
+              title="Dead Stock Items"
+              items={data?.stock_alerts?.dead_stock_items}
+              color="secondary"
+            />
+          </div>
         </div>
-
-        {/* top items: sold and purchase */}
-        <div className="col-span-12 xl:col-span-4">
-          <TopItems title="Top Sold Items" items={data?.top_items?.sold} />
-        </div>
-        <div className="col-span-12 xl:col-span-4">
-          <TopItems
-            title="Top Purchased Items"
-            items={data?.top_items?.purchased}
-          />
-        </div>
-
-        {/* expiry items */}
-        <div className="col-span-12 xl:col-span-4">
-          <ExpiryItems items={data?.stock_alerts?.expiring_items} />
-        </div>
-
-        {/* stock alerts */}
-        <div className="col-span-12 xl:col-span-4">
-          <StockAlerts
-            title="Out of Stock Items"
-            items={data?.stock_alerts?.out_of_stock_items}
-          />
-        </div>
-        <div className="col-span-12 xl:col-span-4">
-          <StockAlerts
-            title="Low Stock Items"
-            items={data?.stock_alerts?.low_stock_items}
-          />
-        </div>
-        <div className="col-span-12 xl:col-span-4">
-          <StockAlerts
-            title="Dead Stock Items"
-            items={data?.stock_alerts?.dead_stock_items}
-          />
-        </div>
-
-        {/* <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
-        </div> */}
-
-        <div className="col-span-12">
-          <StatisticsChart data={data?.charts} />
-        </div>
-
-        {/* <div className="col-span-12 xl:col-span-5">
-          <DemographicCard />
-        </div> */}
-
-        {/* <div className="col-span-12 xl:col-span-6">
-          <RecentOrders />
-        </div> */}
       </div>
     </>
   );

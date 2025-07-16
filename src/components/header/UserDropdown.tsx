@@ -9,8 +9,7 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
 
-console.log("User:", JSON.stringify(user, null, 2));
-const profileImage = user?.profile_image || "/images/user/default.jpg";
+  const profileImage = user?.profile_image || "/images/user/default.jpg";
   const displayName = user?.name || "Anonymous";
   const displayEmail = user?.email || "no-email@example.com";
 

@@ -13,6 +13,7 @@ interface Customer {
   email: string;
   phone: string;
   total_spent: number;
+  profile_image?: string;
 }
 
 interface Props {
@@ -21,7 +22,7 @@ interface Props {
 }
 
 export default function CustomersTable({ customers, title = "Customers" }: Props) {
-      if (!customers || customers.length === 0) {
+  if (!customers || customers.length === 0) {
     return (
       <TableSection title={title}>
         <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -30,7 +31,7 @@ export default function CustomersTable({ customers, title = "Customers" }: Props
       </TableSection>
     );
   }
-  
+
   return (
     <TableSection title={title}>
       <Table>
@@ -69,7 +70,16 @@ export default function CustomersTable({ customers, title = "Customers" }: Props
           {customers.map((customer) => (
             <TableRow key={customer.id}>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                {customer.name}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 overflow-hidden rounded-full">
+                    <img
+                      src={customer.profile_image || '/images/user/default.jpg'}
+                      alt={customer.name}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <span>{customer.name}</span>
+                </div>
               </TableCell>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
                 {customer.email}
@@ -78,7 +88,7 @@ export default function CustomersTable({ customers, title = "Customers" }: Props
                 {customer.phone}
               </TableCell>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                {customer.total_spent}
+                ${customer.total_spent.toFixed(2)}
               </TableCell>
             </TableRow>
           ))}

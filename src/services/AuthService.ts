@@ -1,27 +1,42 @@
-import axios from "axios";
+import api from "./api";
 
 export const login = async (email: string, password: string) => {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("password", password);
 
-  const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, formData);
+  const response = await api.post('/login', formData);
   return response.data;
 };
 
-export const storeToken = (token: string, persistent = false) => {
-  if (persistent) {
-    localStorage.setItem("token", token); // survives browser close
-  } else {
-    sessionStorage.setItem("token", token); // gone when tab closes
+export const logout = async () => {
+  // Notify the server about logout
+  try {
+    await api.post('/logout');
+  } catch (error) {
+    console.error("Logout failed on server:", error);
+  } finally {
+    // Always clear local data
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    // Remove the authorization header
+    delete api.defaults.headers.common["Authorization"];
   }
 };
 
-export const getToken = () => {
-  return sessionStorage.getItem("token") || localStorage.getItem("token");
+export const storeUser = (user: any, persistent = false) => {
+  const userString = JSON.stringify(user);
+  if (persistent) {
+    localStorage.setItem("user", userString);
+  } else {
+    sessionStorage.setItem("user", userString);
+  }
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
-  sessionStorage.removeItem("token");
+export const getUser = () => {
+  const userString = sessionStorage.getItem("user") || localStorage.getItem("user");
+  if (userString) {
+    return JSON.parse(userString);
+  }
+  return null;
 };

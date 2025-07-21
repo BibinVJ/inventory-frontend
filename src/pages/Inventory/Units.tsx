@@ -25,7 +25,7 @@ export default function Units() {
 
   const fetchUnits = async (page = 1, limit = 10) => {
     try {
-      const response = await api.get(`/unit?perPage=${limit}&page=${page}&is_active=1&unpaginated=0`);
+      const response = await api.get(`/unit?perPage=${limit}&page=${page}`);
       setUnits(response.data.results.data);
       setTotalPages(response.data.results.last_page);
       setCurrentPage(response.data.results.current_page);

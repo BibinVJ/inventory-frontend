@@ -59,7 +59,6 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
                     }}
                     error={!!errors.name}
                     hint={errors.name}
-                    required
                   />
                 </div>
 

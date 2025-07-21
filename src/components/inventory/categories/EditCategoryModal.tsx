@@ -49,6 +49,8 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
     }
   };
 
+
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
       <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
@@ -75,7 +77,6 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
                     }}
                     error={!!errors.name}
                     hint={errors.name}
-                    required
                   />
                 </div>
 
@@ -90,9 +91,10 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
                 </div>
                 <div>
                   <Label>Status</Label>
+                  {{ isActive }}
                   <Switch
                     label={isActive ? 'Active' : 'Inactive'}
-                    checked={isActive}
+                    defaultChecked={isActive}
                     onChange={setIsActive}
                   />
                 </div>

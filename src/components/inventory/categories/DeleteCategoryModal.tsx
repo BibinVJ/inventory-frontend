@@ -1,5 +1,6 @@
 import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
+import Button from '../../ui/button/Button';
 
 interface Category {
   id: number;
@@ -28,23 +29,46 @@ export default function DeleteCategoryModal({ isOpen, onClose, onCategoryDeleted
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
       <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900">
-        <div className="px-2 pr-14">
+        <div className="p-4 text-center">
+          <div className="mx-auto mb-5 text-red-500 bg-red-100 rounded-full w-14 h-14">
+            <svg
+              className="w-14 h-14"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              ></path>
+            </svg>
+          </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
             Delete Category
           </h4>
-          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+          <p className="mb-6 text-gray-500 dark:text-gray-400">
             Are you sure you want to delete the category "{category?.name}"? This action cannot be undone.
           </p>
-        </div>
-        <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-500">
-            Cancel
-          </button>
-          <button type="button" onClick={handleDelete} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900">
-            Delete
-          </button>
+          <div className="flex items-center justify-center gap-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="text-white bg-red-600 hover:bg-red-800"
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

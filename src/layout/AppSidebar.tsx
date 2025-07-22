@@ -11,7 +11,6 @@ import {
   ListIcon,
   PageIcon,
   PieChartIcon,
-  PlugInIcon,
   TableIcon,
   UserCircleIcon,
 } from "../icons";
@@ -47,6 +46,22 @@ const navItems: NavItem[] = [
       { name: "Categories", path: "/inventory/categories", pro: false },
       { name: "Units", path: "/inventory/units", pro: false },
       { name: "Items", path: "/inventory/items", pro: false },
+    ],
+  },
+  {
+    name: "Sales",
+    icon: <ListIcon />,
+    subItems: [
+      { name: "Customers", path: "/customers", pro: false },
+      { name: "Sales", path: "/sales", pro: false },
+    ],
+  },
+  {
+    name: "Purchases",
+    icon: <ListIcon />,
+    subItems: [
+      { name: "Vendors", path: "/vendors", pro: false },
+      { name: "Purchases", path: "/purchases", pro: false },
     ],
   },
   {
@@ -90,14 +105,6 @@ const othersItems: NavItem[] = [
       { name: "Videos", path: "/videos", pro: false },
     ],
   },
-  // {
-  //   icon: <PlugInIcon />,
-  //   name: "Authentication",
-  //   subItems: [
-  //     { name: "Sign In", path: "/signin", pro: false },
-  //     { name: "Sign Up", path: "/signup", pro: false },
-  //   ],
-  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -115,7 +122,7 @@ const AppSidebar: React.FC = () => {
 
   // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback(
-    (path: string) => location.pathname === path,
+    (path: string) => location.pathname.startsWith(path),
     [location.pathname]
   );
 

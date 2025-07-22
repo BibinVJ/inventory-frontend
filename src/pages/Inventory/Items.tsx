@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -8,12 +7,25 @@ import ItemTable from '../../components/inventory/items/ItemTable';
 import AddItemModal from '../../components/inventory/items/AddItemModal';
 import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
+import Button from '../../components/ui/button/Button';
+import Select from '../../components/form/Select';
 
 interface Item {
   id: number;
+  sku: string;
   name: string;
   description: string;
   is_active: boolean;
+  category: {
+    id: number;
+    name: string;
+  };
+  unit: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  type: string;
 }
 
 export default function Items() {
@@ -22,29 +34,47 @@ export default function Items() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
 
-  const fetchItems = async (page = 1, limit = 10) => {
+  const fetchItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await api.get(`/item?perPage=${limit}&page=${page}`);
-      setItems(response.data.results.data);
-      setTotalPages(response.data.results.last_page);
-      setCurrentPage(response.data.results.current_page);
+      const response = await api.get(`/item?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
+      const { data, last_page, current_page, from, to, total } = response.data.results;
+      setItems(data);
+      setTotalPages(last_page);
+      setCurrentPage(current_page);
+      setFrom(from);
+      setTo(to);
+      setTotal(total);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
   };
 
   useEffect(() => {
-    fetchItems(currentPage, perPage);
-  }, [currentPage, perPage]);
+    fetchItems(currentPage, perPage, sortBy, sortDirection);
+  }, [currentPage, perPage, sortBy, sortDirection]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPerPage(parseInt(e.target.value, 10));
-    setCurrentPage(1); // Reset to first page when per page changes
+  const handlePerPageChange = (value: string) => {
+    setPerPage(parseInt(value, 10));
+    setCurrentPage(1);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDirection('asc');
+    }
   };
 
   return (
@@ -57,25 +87,41 @@ export default function Items() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
-          <select
-            id="perPage"
-            value={perPage}
+          <Select
+            options={[
+              { value: '10', label: '10' },
+              { value: '20', label: '20' },
+              { value: '50', label: '50' },
+            ]}
             onChange={handlePerPageChange}
-            className="block w-full px-2 py-1 text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+            defaultValue={String(perPage)}
+            showPlaceholder={false}
+            className="w-20"
+          />
         </div>
-        <button onClick={openModal} className="px-4 py-2 text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <Button onClick={openModal}>
           Add Item
-        </button>
+        </Button>
       </div>
       <div className="space-y-6">
         <ComponentCard title="Items">
-          <ItemTable data={items} onAction={() => fetchItems(currentPage, perPage)} />
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <ItemTable
+            data={items}
+            onAction={() => fetchItems(currentPage, perPage, sortBy, sortDirection)}
+            onSort={handleSort}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            currentPage={currentPage}
+            perPage={perPage}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            from={from}
+            to={to}
+            total={total}
+          />
         </ComponentCard>
       </div>
       <AddItemModal isOpen={isOpen} onClose={closeModal} onItemAdded={() => fetchItems(1, perPage)} />

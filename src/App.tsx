@@ -21,6 +21,12 @@ import FormElements from "./pages/Forms/FormElements";
 import Categories from "./pages/Inventory/Categories";
 import Units from "./pages/Inventory/Units";
 import Items from "./pages/Inventory/Items";
+import Vendors from "./pages/Vendor/Vendors";
+import Customers from "./pages/Customer/Customers";
+import Purchases from "./pages/Purchase/Purchases";
+import AddPurchase from "./pages/Purchase/AddPurchase";
+import Sales from "./pages/Sales/Sales";
+import AddSale from "./pages/Sales/AddSale";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
@@ -50,6 +56,16 @@ export default function App() {
               <Route path="/inventory/categories" element={<Categories />} />
               <Route path="/inventory/units" element={<Units />} />
               <Route path="/inventory/items" element={<Items />} />
+
+              {/* People */}
+              <Route path="/vendors" element={<Vendors />} />
+              <Route path="/customers" element={<Customers />} />
+
+              {/* Transactions */}
+              <Route path="/purchases" element={<Purchases />} />
+              <Route path="/purchases/add" element={<AddPurchase />} />
+              <Route path="/sales" element={<Sales />} />
+              <Route path="/sales/add" element={<AddSale />} />
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />

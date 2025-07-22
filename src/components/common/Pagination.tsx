@@ -1,11 +1,16 @@
 
+import Button from "../ui/button/Button";
+
 interface Props {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  from: number;
+  to: number;
+  total: number;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: Props) {
+export default function Pagination({ currentPage, totalPages, onPageChange, from, to, total }: Props) {
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -55,41 +60,45 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pr
 
   return (
     <div className="flex items-center justify-between mt-4">
-      <button
-        onClick={handlePrevious}
-        disabled={currentPage === 1}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-      >
-        Previous
-      </button>
-      <div className="flex items-center gap-2">
-        {getPageNumbers().map((page, index) => (
-          typeof page === 'number' ? (
-            <button
-              key={index}
-              onClick={() => onPageChange(page)}
-              className={`px-3 py-1 text-sm font-medium rounded-md ${
-                currentPage === page
-                  ? 'text-white bg-blue-600'
-                  : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
-              }`}
-            >
-              {page}
-            </button>
-          ) : (
-            <span key={index} className="px-3 py-1 text-sm font-medium text-gray-700">
-              {page}
-            </span>
-          )
-        ))}
+      <div className="text-sm text-gray-700 dark:text-gray-400">
+        Showing {from} to {to} of {total} results
       </div>
-      <button
-        onClick={handleNext}
-        disabled={currentPage === totalPages}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-      >
-        Next
-      </button>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          variant="outline"
+        >
+          Previous
+        </Button>
+        <div className="flex items-center gap-2">
+          {getPageNumbers().map((page, index) => (
+            typeof page === 'number' ? (
+              <Button
+                size="xs"
+                key={index}
+                onClick={() => onPageChange(page)}
+                variant={currentPage === page ? 'primary' : 'outline'}
+              >
+                {page}
+              </Button>
+            ) : (
+              <span key={index} className="px-3 py-1 text-sm font-medium text-gray-700">
+                {page}
+              </span>
+            )
+          ))}
+        </div>
+        <Button
+          size="sm"
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          variant="outline"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 }

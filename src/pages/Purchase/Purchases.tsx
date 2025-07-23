@@ -7,7 +7,8 @@ import PageMeta from '../../components/common/PageMeta';
 import PurchaseTable from '../../components/purchase/PurchaseTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import { Link } from 'react-router';
+import Select from '../../components/form/Select';
+import { useNavigate } from 'react-router';
 
 interface Purchase {
   id: number;
@@ -16,7 +17,8 @@ interface Purchase {
   vendor: {
     name: string;
   };
-  total: number;
+  total_amount: number;
+  payment_status: string;
 }
 
 export default function Purchases() {
@@ -29,6 +31,7 @@ export default function Purchases() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const navigate = useNavigate();
 
   const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
@@ -53,6 +56,11 @@ export default function Purchases() {
     setCurrentPage(page);
   };
 
+  const handlePerPageChange = (value: string) => {
+    setPerPage(parseInt(value, 10));
+    setCurrentPage(1);
+  };
+
   const handleSort = (column: string) => {
     if (sortBy === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -69,17 +77,31 @@ export default function Purchases() {
         description="List of purchases"
       />
       <PageBreadcrumb pageTitle="Purchases" />
-      <div className="flex items-center justify-end mb-4">
-        <Link to="/purchases/add">
-          <Button>
-            Add Purchase
-          </Button>
-        </Link>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
+          <Select
+            options={[
+              { value: '10', label: '10' },
+              { value: '20', label: '20' },
+              { value: '50', label: '50' },
+            ]}
+            onChange={handlePerPageChange}
+            defaultValue={String(perPage)}
+            showPlaceholder={false}
+            className="w-20"
+            searchable={false}
+          />
+        </div>
+        <Button onClick={() => navigate('/purchases/add')}>
+          Add Purchase
+        </Button>
       </div>
       <div className="space-y-6">
-        <ComponentCard title="Purchases">
+        <ComponentCard>
           <PurchaseTable
             data={purchases}
+            onAction={() => fetchPurchases(currentPage, perPage, sortBy, sortDirection)}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}

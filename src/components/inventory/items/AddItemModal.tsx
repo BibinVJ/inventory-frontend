@@ -46,8 +46,8 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/category?perPage=all');
-      setCategories(response.data.results.data);
+      const response = await api.get('/category?unpaginated=1');
+      setCategories(response.data.results);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -55,8 +55,8 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
 
   const fetchUnits = async () => {
     try {
-      const response = await api.get('/unit?perPage=all');
-      setUnits(response.data.results.data);
+      const response = await api.get('/unit?unpaginated=1');
+      setUnits(response.data.results);
     } catch (error) {
       console.error('Error fetching units:', error);
     }

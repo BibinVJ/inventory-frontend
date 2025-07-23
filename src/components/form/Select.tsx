@@ -15,6 +15,7 @@ interface SelectProps {
   showPlaceholder?: boolean;
   error?: boolean;
   hint?: string;
+  searchable?: boolean;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -26,6 +27,7 @@ const Select: React.FC<SelectProps> = ({
   showPlaceholder = true,
   error = false,
   hint = "",
+  searchable = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,10 +36,10 @@ const Select: React.FC<SelectProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && searchable) {
       searchInputRef.current?.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, searchable]);
   
   useEffect(() => {
     setSelectedValue(defaultValue);
@@ -62,9 +64,11 @@ const Select: React.FC<SelectProps> = ({
     setIsOpen(false);
   };
 
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOptions = searchable
+    ? options.filter(option =>
+        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : options;
 
   const selectedLabel = options.find(option => option.value === selectedValue)?.label || placeholder;
 
@@ -85,16 +89,18 @@ const Select: React.FC<SelectProps> = ({
       </div>
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
-          <div className="p-2">
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search..."
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+          {searchable && (
+            <div className="p-2">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search..."
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          )}
           <ul className="max-h-60 overflow-y-auto">
             {showPlaceholder && !searchTerm && (
               <li

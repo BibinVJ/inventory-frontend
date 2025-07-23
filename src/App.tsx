@@ -1,104 +1,109 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
-import PublicRoute from "./services/PublicRoute";
-import PrivateRoute from "./services/PrivateRoute";
-import TopProgressBar from "./components/common/TopProgressBar";
+import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
+import { useRoutes } from "react-router";
+import "nprogress/nprogress.css";
+import "./nprogress-custom.css";
+
+import AppLayout from "./layout/AppLayout";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
+import PublicRoute from "./services/PublicRoute";
+import PrivateRoute from "./services/PrivateRoute";
+import AddPurchase from "./pages/Purchase/AddPurchase";
+import EditPurchase from "./pages/Purchase/EditPurchase";
+import ViewPurchase from "./pages/Purchase/ViewPurchase";
 import UserProfiles from "./pages/UserProfiles";
-import Videos from "./pages/UiElements/Videos";
-import Images from "./pages/UiElements/Images";
+import Calendar from "./pages/Calendar";
+import Blank from "./pages/Blank";
+import FormElements from "./pages/Forms/FormElements";
+import BasicTables from "./pages/Tables/BasicTables";
 import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
 import Avatars from "./pages/UiElements/Avatars";
+import Badges from "./pages/UiElements/Badges";
 import Buttons from "./pages/UiElements/Buttons";
+import Images from "./pages/UiElements/Images";
+import Videos from "./pages/UiElements/Videos";
 import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
-import Categories from "./pages/Inventory/Categories";
-import Units from "./pages/Inventory/Units";
-import Items from "./pages/Inventory/Items";
-import Vendors from "./pages/Vendor/Vendors";
-import Customers from "./pages/Customer/Customers";
-import Purchases from "./pages/Purchase/Purchases";
-import AddPurchase from "./pages/Purchase/AddPurchase";
 import Sales from "./pages/Sales/Sales";
 import AddSale from "./pages/Sales/AddSale";
-import AppLayout from "./layout/AppLayout";
-import { ScrollToTop } from "./components/common/ScrollToTop";
-import Home from "./pages/Dashboard/Home";
-import "./nprogress-custom.css";
-import Blank from "./pages/Blank";
 
+const Dashboard = lazy(() => import("./pages/Dashboard/Home"));
+const Customers = lazy(() => import("./pages/Customer/Customers"));
+const Vendors = lazy(() => import("./pages/Vendor/Vendors"));
+const Purchases = lazy(() => import("./pages/Purchase/Purchases"));
+const Categories = lazy(() => import("./pages/Inventory/Categories"));
+const Units = lazy(() => import("./pages/Inventory/Units"));
+const Items = lazy(() => import("./pages/Inventory/Items"));
 
-export default function App() {
+const AppRoutes = () => {
+  const routes = useRoutes([
+    {
+      element: <PrivateRoute />,
+      children: [
+        {
+          path: "/",
+          element: <AppLayout />,
+          children: [
+            // inventory
+            { index: true, element: <Dashboard /> },
+            { path: "inventory/categories", element: <Categories /> },
+            { path: "inventory/units", element: <Units /> },
+            { path: "inventory/items", element: <Items /> },
+
+            // sales
+            { path: "customers", element: <Customers /> },
+            { path: "sales", element: <Sales /> },
+            { path: "sales/add", element: <AddSale /> },
+
+            // purchases
+            { path: "vendors", element: <Vendors /> },
+            { path: "purchases", element: <Purchases /> },
+            { path: "purchases/add", element: <AddPurchase /> },
+            { path: "purchases/edit/:id", element: <EditPurchase /> },
+            { path: "purchases/:id", element: <ViewPurchase /> },
+
+            // others
+            { path: "profile", element: <UserProfiles /> },
+            { path: "calendar", element: <Calendar /> },
+            { path: "blank", element: <Blank /> },
+            { path: "form-elements", element: <FormElements /> },
+            { path: "basic-tables", element: <BasicTables /> },
+            { path: "alerts", element: <Alerts /> },
+            { path: "avatars", element: <Avatars /> },
+            { path: "badge", element: <Badges /> },
+            { path: "buttons", element: <Buttons /> },
+            { path: "images", element: <Images /> },
+            { path: "videos", element: <Videos /> },
+            { path: "line-chart", element: <LineChart /> },
+            { path: "bar-chart", element: <BarChart /> },
+          ],
+        },
+      ],
+    },
+    {
+      element: <PublicRoute />,
+      children: [
+        { path: "signin", element: <SignIn /> },
+        { path: "signup", element: <SignUp /> },
+      ],
+    },
+    { path: "*", element: <NotFound /> },
+  ]);
+
+  return routes;
+};
+
+function App() {
   return (
     <>
-      <Router>
-        <TopProgressBar />
-        <ScrollToTop />
-
-        <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<AppLayout />}>
-              <Route index path="/" element={<Home />} />
-
-              {/* Others Page */}
-              <Route path="/profile" element={<UserProfiles />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/blank" element={<Blank />} />
-              
-              {/* Inventory */}
-              <Route path="/inventory/categories" element={<Categories />} />
-              <Route path="/inventory/units" element={<Units />} />
-              <Route path="/inventory/items" element={<Items />} />
-
-              {/* People */}
-              <Route path="/vendors" element={<Vendors />} />
-              <Route path="/customers" element={<Customers />} />
-
-              {/* Transactions */}
-              <Route path="/purchases" element={<Purchases />} />
-              <Route path="/purchases/add" element={<AddPurchase />} />
-              <Route path="/sales" element={<Sales />} />
-              <Route path="/sales/add" element={<AddSale />} />
-
-              {/* Forms */}
-              <Route path="/form-elements" element={<FormElements />} />
-
-              {/* Tables */}
-              <Route path="/basic-tables" element={<BasicTables />} />
-
-              {/* Ui Elements */}
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/avatars" element={<Avatars />} />
-              <Route path="/badge" element={<Badges />} />
-              <Route path="/buttons" element={<Buttons />} />
-              <Route path="/images" element={<Images />} />
-              <Route path="/videos" element={<Videos />} />
-
-              {/* Charts */}
-              <Route path="/line-chart" element={<LineChart />} />
-              <Route path="/bar-chart" element={<BarChart />} />
-            </Route>
-          </Route>
-
-          {/* Auth Layout */}
-          <Route element={<PublicRoute />}>
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-          </Route>
-
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-
-      <Toaster richColors position="top-right" closeButton />
+      <Toaster richColors position="top-right" closeButton={true} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <AppRoutes />
+      </Suspense>
     </>
   );
 }
+
+export default App;

@@ -87,6 +87,7 @@ export default function Categories() {
             defaultValue={String(perPage)}
             showPlaceholder={false}
             className="w-20"
+            searchable={false}
           />
         </div>
         <Button onClick={openModal}>

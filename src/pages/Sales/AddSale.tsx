@@ -43,8 +43,8 @@ export default function AddSale() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get('/customer?perPage=all');
-      setCustomers(response.data.results.data);
+      const response = await api.get('/customer?unpaginated=1');
+      setCustomers(response.data.results);
     } catch (error) {
       console.error('Error fetching customers:', error);
     }
@@ -52,8 +52,8 @@ export default function AddSale() {
 
   const fetchItems = async () => {
     try {
-      const response = await api.get('/item?perPage=all');
-      setItems(response.data.results.data);
+      const response = await api.get('/item?unpaginated=1');
+      setItems(response.data.results);
     } catch (error) {
       console.error('Error fetching items:', error);
     }

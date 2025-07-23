@@ -12,11 +12,20 @@ import ExpiryItems from "../../components/ecommerce/ExpiryItems";
 export default function Home() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [chartData, setChartData] = useState<any>(null);
 
   useEffect(() => {
     getDashboardData()
       .then((res) => {
-        setData(res.data.results);
+        const results = res.data.results;
+        setData(results);
+
+        // Transform chart data
+        const transformedChartData = {
+          sales: results.charts?.sales ? Object.values(results.charts.sales) : [],
+          purchases: results.charts?.purchases ? Object.values(results.charts.purchases) : [],
+        };
+        setChartData(transformedChartData);
       })
       .catch((err) => {
         console.error("Dashboard fetch failed", err);
@@ -48,8 +57,8 @@ export default function Home() {
         <div className="grid grid-cols-12 gap-4 md:gap-6">
           {/* Left Side: Main Charts and Tables */}
           <div className="col-span-12 space-y-6 xl:col-span-8">
-            <MonthlySalesChart data={data?.charts?.sales} />
-            <StatisticsChart data={data?.charts} />
+            <MonthlySalesChart data={chartData?.sales} />
+            <StatisticsChart data={chartData} />
             <CustomersTable title="Top Customers" customers={data?.customers?.best_customers} />
           </div>
 

@@ -16,13 +16,15 @@ interface TopItem {
 }
 
 interface Props {
-  items: TopItem[];
+  items: TopItem[] | TopItem;
   title?: string;
   color?: "success" | "error" | "warning" | "secondary";
 }
 
 export default function StockAlerts({ items, title = "Stock Alert", color = "error" }: Props) {
-  if (!items || items.length === 0) {
+  const itemsArray = Array.isArray(items) ? items : (items ? [items] : []);
+
+  if (itemsArray.length === 0) {
     return (
       <TableSection title={title}>
         <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -61,7 +63,7 @@ export default function StockAlerts({ items, title = "Stock Alert", color = "err
 
         {/* Table Body */}
         <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {items.map((item) => (
+          {itemsArray.map((item) => (
             <TableRow key={item.id}>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
                 {item.sku}
@@ -81,3 +83,4 @@ export default function StockAlerts({ items, title = "Stock Alert", color = "err
     </TableSection>
   );
 }
+

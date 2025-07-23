@@ -36,3 +36,87 @@ Todo:
 - profile page view/update
 
 - add side bar items
+
+
+
+🔷 Recommended Sidebar Structure
+1. Dashboard
+📊 Overview
+
+🔔 Alerts / Notifications (optional)
+
+2. Inventory Management
+📦 Items
+
+🗂️ Categories
+
+🏷️ Units of Measurement
+
+🏪 Warehouses
+
+🔄 Inventory Transfers
+
+✏️ Inventory Adjustments
+
+3. Procurement
+📥 Purchase Orders
+
+✅ Goods Received Notes (GRNs)
+
+🧾 Purchase Invoices
+
+💳 Debit Notes
+
+👨‍💼 Vendors
+
+4. Sales
+🛒 Sales Orders
+
+📤 Delivery Notes
+
+📄 Sales Invoices
+
+💸 Credit Notes
+
+👩‍💼 Customers
+
+5. Accounting
+📚 Chart of Accounts
+
+💰 Journal Entries
+
+💹 Taxes
+
+Tax Rates
+
+Tax Groups
+
+Item Tax Mapping
+
+💱 Currency Management
+
+🏢 Cost Centers
+
+6. Reports 📑
+Inventory Reports
+
+Purchase Reports
+
+Sales Reports
+
+Tax Reports
+
+Profit & Loss
+
+Stock Valuation
+
+Customer/Vendor Statements
+
+7. Settings ⚙️
+System Settings
+
+User Management
+
+Roles & Permissions
+
+Company Info

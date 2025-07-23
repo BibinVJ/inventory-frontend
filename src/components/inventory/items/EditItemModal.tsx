@@ -76,8 +76,8 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/category?perPage=all');
-      setCategories(response.data.results.data);
+      const response = await api.get('/category?unpaginated=1');
+      setCategories(response.data.results);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -85,8 +85,8 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchUnits = async () => {
     try {
-      const response = await api.get('/unit?perPage=all');
-      setUnits(response.data.results.data);
+      const response = await api.get('/unit?unpaginated=1');
+      setUnits(response.data.results);
     } catch (error) {
       console.error('Error fetching units:', error);
     }

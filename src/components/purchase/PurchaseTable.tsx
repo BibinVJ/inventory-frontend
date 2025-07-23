@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -6,7 +5,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
+import { useState } from "react";
+import Badge from "../ui/badge/Badge";
+import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide, View } from 'lucide-react';
+import Button from "../ui/button/Button";
+import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
+import Tooltip from "../ui/tooltip/Tooltip";
+import { useNavigate } from "react-router";
+import VoidPurchaseModal from "./VoidPurchaseModal";
 
 interface Purchase {
   id: number;
@@ -15,11 +21,13 @@ interface Purchase {
   vendor: {
     name: string;
   };
-  total: number;
+  total_amount: number;
+  payment_status: string;
 }
 
 interface Props {
   data: Purchase[];
+  onAction: () => void;
   onSort: (column: string) => void;
   sortBy: string;
   sortDirection: string;
@@ -27,7 +35,28 @@ interface Props {
   perPage: number;
 }
 
-export default function PurchaseTable({ data, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+export default function PurchaseTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+  const navigate = useNavigate();
+  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+
+  const handleView = (id: number) => {
+    navigate(`/purchases/${id}`);
+  };
+
+  const handleEdit = (id: number) => {
+    navigate(`/purchases/edit/${id}`);
+  };
+
+  const handleDelete = (purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setIsVoidModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsVoidModalOpen(false);
+    setSelectedPurchase(null);
+  };
 
   const renderSortIcon = (column: string) => {
     if (sortBy !== column) {
@@ -48,9 +77,11 @@ export default function PurchaseTable({ data, onSort, sortBy, sortDirection, cur
             <TableRow>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('invoice_number')}>Invoice # {renderSortIcon('invoice_number')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('vendor_id')}>Vendor {renderSortIcon('vendor_id')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('purchase_date')}>Purchase Date {renderSortIcon('purchase_date')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('total')}>Total Amount {renderSortIcon('total')}</TableCell>
+              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('vendor_id')}>Vendor {renderSortIcon('vendor_id')}</TableCell>
+              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('total_amount')}>Total Amount {renderSortIcon('total_amount')}</TableCell>
+              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('payment_status')}>Payment Status {renderSortIcon('payment_status')}</TableCell>
+              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
           </TableHeader>
 
@@ -63,14 +94,58 @@ export default function PurchaseTable({ data, onSort, sortBy, sortDirection, cur
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.invoice_number}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.vendor.name}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.purchase_date}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.total}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.vendor.name}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{purchase.total_amount}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  <Badge size="sm" color={purchase.payment_status === 'paid' ? "success" : "warning"}>
+                    {purchase.payment_status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <Tooltip text="View">
+                      <Button
+                        size="xs"
+                        onClick={() => handleView(purchase.id)}
+                        className="bg-gray-600 hover:bg-gray-700 text-white"
+                      >
+                        <View className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip text="Edit">
+                      <Button
+                        size="xs"
+                        onClick={() => handleEdit(purchase.id)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip text="Void">
+                      <Button
+                        size="xs"
+                        onClick={() => handleDelete(purchase)}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <TrashBinIcon className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+      {selectedPurchase && (
+        <VoidPurchaseModal
+          isOpen={isVoidModalOpen}
+          onClose={handleCloseModal}
+          onPurchaseVoided={onAction}
+          purchase={selectedPurchase}
+        />
+      )}
     </div>
   );
 }

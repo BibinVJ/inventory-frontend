@@ -9,9 +9,8 @@ import Select from '../../components/form/Select';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
 import TextArea from '../../components/form/input/TextArea';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
-import { formatDate } from '../../utils/date';
 
 interface Vendor {
   id: number;
@@ -24,6 +23,7 @@ interface Item {
 }
 
 interface PurchaseItem {
+  id?: number;
   item_id: string;
   description: string;
   batch_number: string;
@@ -37,32 +37,42 @@ interface ApiError {
   [key: string]: string[];
 }
 
-export default function AddPurchase() {
+export default function EditPurchase() {
+  const { id } = useParams();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [vendorId, setVendorId] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState(formatDate(new Date()));
-  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([
-    { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }
-  ]);
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [errors, setErrors] = useState<ApiError>({});
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchVendors();
     fetchItems();
-    fetchNextInvoiceNumber();
-  }, []);
+    fetchPurchase();
+  }, [id]);
 
-  const fetchNextInvoiceNumber = async () => {
+  const fetchPurchase = async () => {
     try {
-      const response = await api.get('/purchase/next-invoice-number');
-      if (response.data.results) {
-        setInvoiceNumber(response.data.results.invoice_number);
-      }
+      const response = await api.get(`/purchase/${id}`);
+      const { vendor, invoice_number, purchase_date, items } = response.data.results;
+      setVendorId(String(vendor.id));
+      setInvoiceNumber(invoice_number);
+      setPurchaseDate(purchase_date);
+      setPurchaseItems(items.map((item: any) => ({
+        id: item.id,
+        item_id: String(item.item.id),
+        description: item.description || '',
+        batch_number: item.batch.batch_number,
+        expiry_date: item.batch.expiry_date,
+        manufacture_date: item.batch.manufacture_date,
+        quantity: item.quantity,
+        unit_cost: item.unit_cost,
+      })));
     } catch (error) {
-      console.error('Error fetching next invoice number:', error);
+      console.error('Error fetching purchase:', error);
     }
   };
 
@@ -140,24 +150,31 @@ export default function AddPurchase() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('skdhfbjf');
     e.preventDefault();
     if (!validateForm()) {
       return;
     }
 
+    const payload = {
+      vendor_id: vendorId,
+      invoice_number: invoiceNumber,
+      purchase_date: purchaseDate,
+      payment_status: 'pending',
+      items: purchaseItems.map(({ description, batch_number, ...item }) => ({
+        ...item,
+        batch_number: batch_number,
+      })),
+    };
+
     try {
-      await api.post('/purchase', {
-        vendor_id: vendorId,
-        invoice_number: invoiceNumber,
-        purchase_date: purchaseDate,
-        items: purchaseItems,
-      });
+      await api.put(`/purchase/${id}`, payload);
       navigate('/purchases');
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
       } else {
-        console.error('Error creating purchase:', error);
+        console.error('Error updating purchase:', error);
       }
     }
   };
@@ -169,10 +186,10 @@ export default function AddPurchase() {
   return (
     <>
       <PageMeta
-        title="Add Purchase | Pharmacy Manager"
-        description="Add a new purchase"
+        title="Edit Purchase | Pharmacy Manager"
+        description="Edit an existing purchase"
       />
-      <PageBreadcrumb pageTitle="Add Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true}/>
+      <PageBreadcrumb pageTitle="Edit Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true} />
 
       <ComponentCard>
         <form onSubmit={handleSubmit}>
@@ -212,7 +229,6 @@ export default function AddPurchase() {
 
           <div className="flex items-center justify-between mt-6 mb-4">
             <h3 className="text-lg font-semibold dark:text-gray-400">Items</h3>
-            
             <Button type="button" variant="outline" onClick={handleAddItem}>
               Add Item
             </Button>
@@ -305,7 +321,7 @@ export default function AddPurchase() {
 
           <div className="flex justify-end mt-6">
             <Button type="submit">
-              Save Purchase
+              Update Purchase
             </Button>
           </div>
         </form>
@@ -313,4 +329,3 @@ export default function AddPurchase() {
     </>
   );
 }
-

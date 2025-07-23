@@ -89,6 +89,7 @@ export default function Customers() {
             defaultValue={String(perPage)}
             showPlaceholder={false}
             className="w-20"
+            searchable={false}
           />
         </div>
         <Button onClick={openModal}>

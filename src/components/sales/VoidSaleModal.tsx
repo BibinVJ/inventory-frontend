@@ -1,34 +1,32 @@
 
-import api from '../../../services/api';
-import { Modal } from '../../ui/modal';
-import Button from '../../ui/button/Button';
+import api from '../../services/api';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 
-interface Item {
+interface Sale {
   id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
+  invoice_number: string;
 }
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onItemDeleted: () => void;
-  item: Item;
+  onSaleVoided: () => void;
+  sale: Sale;
 }
 
-export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }: Props) {
+export default function VoidSaleModal({ isOpen, onClose, onSaleVoided, sale }: Props) {
 
-  const handleDelete = async () => {
+  const handleVoid = async () => {
     try {
-      await api.delete(`/item/${item.id}`);
-      onItemDeleted();
-      toast.success('Item deleted successfully');
+      await api.delete(`/sale/${sale.id}`);
+      onSaleVoided();
+      toast.success('Sale voided successfully');
       onClose();
     } catch (error) {
-      console.error('Error deleting item:', error);
-      toast.error('Failed to delete item');
+      console.error('Error voiding sale:', error);
+      toast.error('Failed to void sale');
     }
   };
 
@@ -56,10 +54,10 @@ export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Item
+            Void Sale
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the item "{item?.name}"? This action cannot be undone.
+            Are you sure you want to void the sale "{sale?.invoice_number}"? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>
@@ -68,10 +66,10 @@ export default function DeleteItemModal({ isOpen, onClose, onItemDeleted, item }
             <Button
               type="button"
               className="text-white bg-red-600 hover:bg-red-800"
-              onClick={handleDelete}
+              onClick={handleVoid}
             >
-              Delete
-            </Button>.
+              Void Sale
+            </Button>
           </div>
         </div>
       </div>

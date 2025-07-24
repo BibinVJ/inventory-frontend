@@ -12,6 +12,7 @@ import TextArea from '../../components/form/input/TextArea';
 import { useNavigate } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
+import { toast } from 'sonner';
 
 interface Vendor {
   id: number;
@@ -21,6 +22,7 @@ interface Vendor {
 interface Item {
   id: number;
   name: string;
+  type: string;
 }
 
 interface PurchaseItem {
@@ -121,6 +123,7 @@ export default function AddPurchase() {
     }
 
     purchaseItems.forEach((item, index) => {
+        const selectedItem = items.find(i => i.id === Number(item.item_id));
       if (!item.item_id) {
         newErrors[`items.${index}.item_id`] = ['Item is required.'];
       }
@@ -133,6 +136,14 @@ export default function AddPurchase() {
       if (item.unit_cost < 0) {
         newErrors[`items.${index}.unit_cost`] = ['Unit cost cannot be negative.'];
       }
+      if (selectedItem && selectedItem.type === 'product') {
+        if (!item.manufacture_date) {
+            newErrors[`items.${index}.manufacture_date`] = ['MFG date is required.'];
+        }
+        if (!item.expiry_date) {
+            newErrors[`items.${index}.expiry_date`] = ['Expiry date is required.'];
+        }
+      }
     });
 
     setErrors(newErrors);
@@ -142,6 +153,7 @@ export default function AddPurchase() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
+      toast.error('Please correct the errors in the form');
       return;
     }
 
@@ -152,18 +164,26 @@ export default function AddPurchase() {
         purchase_date: purchaseDate,
         items: purchaseItems,
       });
+      toast.success('Purchase created successfully');
       navigate('/purchases');
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error creating purchase:', error);
+        toast.error('Failed to create purchase');
       }
     }
   };
 
   const getErrorMessage = (field: string) => {
     return errors[field] ? errors[field][0] : '';
+  }
+
+  const isProduct = (itemId: string) => {
+    const item = items.find(i => i.id === Number(itemId));
+    return item?.type === 'product';
   }
 
   return (
@@ -224,7 +244,7 @@ export default function AddPurchase() {
               <button
                 type="button"
                 onClick={() => handleRemoveItem(index)}
-                className="absolute p-1 text-red-500 bg-white rounded-full -top-2 -right-2 hover:bg-red-100"
+                className="absolute p-1 text-red-500 bg-red-100 rounded-full -top-2 -right-2 hover:bg-red-300"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
@@ -273,9 +293,20 @@ export default function AddPurchase() {
               </div>
               <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-3">
                 <div>
+                  <Label>Description</Label>
+                  <TextArea
+                    value={item.description}
+                    onChange={(value) => handleItemChange(index, 'description', value)}
+                  />
+                </div>
+                <div>
                   <DatePicker
                     id={`manufacture_date_${index}`}
-                    label="MFG Date"
+                    label={
+                        <>
+                          MFG Date {isProduct(item.item_id) && <span className="text-red-500">*</span>}
+                        </>
+                      }
                     onChange={(_, dateStr) => handleItemChange(index, 'manufacture_date', dateStr)}
                     defaultDate={item.manufacture_date}
                     error={!!getErrorMessage(`items.${index}.manufacture_date`)}
@@ -285,20 +316,18 @@ export default function AddPurchase() {
                 <div>
                   <DatePicker
                     id={`expiry_date_${index}`}
-                    label="Expiry Date"
+                    label={
+                        <>
+                          Expiry Date {isProduct(item.item_id) && <span className="text-red-500">*</span>}
+                        </>
+                      }
                     onChange={(_, dateStr) => handleItemChange(index, 'expiry_date', dateStr)}
                     defaultDate={item.expiry_date}
                     error={!!getErrorMessage(`items.${index}.expiry_date`)}
                     hint={getErrorMessage(`items.${index}.expiry_date`)}
                   />
                 </div>
-                <div>
-                  <Label>Description</Label>
-                  <TextArea
-                    value={item.description}
-                    onChange={(value) => handleItemChange(index, 'description', value)}
-                  />
-                </div>
+                
               </div>
             </div>
           ))}

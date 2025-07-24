@@ -6,6 +6,7 @@ import Label from '../../form/Label';
 import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Unit {
   id: number;
@@ -52,12 +53,15 @@ export default function EditUnitModal({ isOpen, onClose, onUnitUpdated, unit }: 
     try {
       await api.put(`/unit/${unit.id}`, { name, code, description, is_active: isActive });
       onUnitUpdated();
+      toast.success('Unit updated successfully');
       onClose();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error adding category:', error);
+        toast.error('Failed to update unit');
       }
     }
   };

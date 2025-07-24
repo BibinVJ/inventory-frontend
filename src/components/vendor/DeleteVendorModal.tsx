@@ -2,6 +2,7 @@
 import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Vendor {
   id: number;
@@ -21,9 +22,11 @@ export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, ve
     try {
       await api.delete(`/vendor/${vendor.id}`);
       onVendorDeleted();
+      toast.success('Vendor deleted successfully');
       onClose();
     } catch (error) {
       console.error('Error deleting vendor:', error);
+      toast.error('Failed to delete vendor');
     }
   };
 

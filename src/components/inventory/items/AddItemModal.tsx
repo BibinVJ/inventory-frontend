@@ -7,6 +7,7 @@ import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import Select from '../../form/Select';
+import { toast } from 'sonner';
 
 interface Category {
   id: number;
@@ -117,12 +118,15 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
         type,
       });
       onItemAdded();
+      toast.success('Item added successfully');
       handleClose();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error adding item:', error);
+        toast.error('Failed to add item');
       }
     }
   };

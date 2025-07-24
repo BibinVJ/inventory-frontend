@@ -7,6 +7,7 @@ import Label from '../form/Label';
 import Switch from '../form/switch/Switch';
 import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Props {
   isOpen: boolean;
@@ -60,12 +61,15 @@ export default function AddVendorModal({ isOpen, onClose, onVendorAdded }: Props
     try {
       await api.post(`/vendor`, { name, email, phone, address, is_active: isActive });
       onVendorAdded();
+      toast.success('Vendor added successfully');
       handleClose();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error adding vendor:', error);
+        toast.error('Failed to add vendor');
       }
     }
   };

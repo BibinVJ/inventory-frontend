@@ -7,6 +7,7 @@ import Label from '../form/Label';
 import Switch from '../form/switch/Switch';
 import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Vendor {
   id: number;
@@ -66,12 +67,15 @@ export default function EditVendorModal({ isOpen, onClose, onVendorUpdated, vend
     try {
       await api.put(`/vendor/${vendor.id}`, { name, email, phone, address, is_active: isActive });
       onVendorUpdated();
+      toast.success('Vendor updated successfully');
       onClose();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating vendor:', error);
+        toast.error('Failed to update vendor');
       }
     }
   };

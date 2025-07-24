@@ -7,6 +7,7 @@ import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import Select from '../../form/Select';
+import { toast } from 'sonner';
 
 interface Item {
   id: number;
@@ -131,12 +132,15 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
         type,
       });
       onItemUpdated();
+      toast.success('Item updated successfully');
       onClose();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating item:', error);
+        toast.error('Failed to update item');
       }
     }
   };

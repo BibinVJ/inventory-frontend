@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -7,7 +6,8 @@ import PageMeta from '../../components/common/PageMeta';
 import SaleTable from '../../components/sales/SaleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
-import { Link } from 'react-router';
+import Select from '../../components/form/Select';
+import { useNavigate } from 'react-router';
 
 interface Sale {
   id: number;
@@ -30,6 +30,7 @@ export default function Sales() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const navigate = useNavigate();
 
   const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
@@ -54,6 +55,11 @@ export default function Sales() {
     setCurrentPage(page);
   };
 
+  const handlePerPageChange = (value: string) => {
+    setPerPage(parseInt(value, 10));
+    setCurrentPage(1);
+  };
+
   const handleSort = (column: string) => {
     if (sortBy === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -70,17 +76,31 @@ export default function Sales() {
         description="List of sales"
       />
       <PageBreadcrumb pageTitle="Sales" />
-      <div className="flex items-center justify-end mb-4">
-        <Link to="/sales/add">
-          <Button>
-            Add Sale
-          </Button>
-        </Link>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
+          <Select
+            options={[
+              { value: '10', label: '10' },
+              { value: '20', label: '20' },
+              { value: '50', label: '50' },
+            ]}
+            onChange={handlePerPageChange}
+            defaultValue={String(perPage)}
+            showPlaceholder={false}
+            className="w-20"
+            searchable={false}
+          />
+        </div>
+        <Button onClick={() => navigate('/sales/add')}>
+          Add Sale
+        </Button>
       </div>
       <div className="space-y-6">
-        <ComponentCard title="Sales">
+        <ComponentCard>
           <SaleTable
             data={sales}
+            onAction={() => fetchSales(currentPage, perPage, sortBy, sortDirection)}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}

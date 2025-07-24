@@ -2,6 +2,7 @@
 import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Purchase {
   id: number;
@@ -21,9 +22,11 @@ export default function VoidPurchaseModal({ isOpen, onClose, onPurchaseVoided, p
     try {
       await api.delete(`/purchase/${purchase.id}`);
       onPurchaseVoided();
+      toast.success('Purchase voided successfully');
       onClose();
     } catch (error) {
       console.error('Error voiding purchase:', error);
+      toast.error('Failed to void purchase');
     }
   };
 

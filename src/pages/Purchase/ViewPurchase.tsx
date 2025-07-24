@@ -103,7 +103,7 @@ export default function ViewPurchase() {
               <p className="dark:text-gray-400"><strong>Invoice #:</strong> {purchase.invoice_number}</p>
               <p className="dark:text-gray-400"><strong>Purchase Date:</strong> {purchase.purchase_date}</p>
               <p className="dark:text-gray-400"><strong>Payment Status:</strong>
-                <Badge size="sm" color={purchase.payment_status === 'paid' ? 'success' : 'warning'} className="ml-2">
+                <Badge size="sm" color={purchase.payment_status === 'paid' ? 'success' : 'warning'}>
                   {purchase.payment_status}
                 </Badge>
               </p>

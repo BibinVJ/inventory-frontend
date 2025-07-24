@@ -3,31 +3,14 @@ import { Toaster } from "sonner";
 import { useRoutes } from "react-router";
 import "nprogress/nprogress.css";
 import "./nprogress-custom.css";
+import PublicRoute from "./services/PublicRoute";
+import PrivateRoute from "./services/PrivateRoute";
 
 import AppLayout from "./layout/AppLayout";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
-import PublicRoute from "./services/PublicRoute";
-import PrivateRoute from "./services/PrivateRoute";
-import AddPurchase from "./pages/Purchase/AddPurchase";
-import EditPurchase from "./pages/Purchase/EditPurchase";
-import ViewPurchase from "./pages/Purchase/ViewPurchase";
-import UserProfiles from "./pages/UserProfiles";
-import Calendar from "./pages/Calendar";
-import Blank from "./pages/Blank";
-import FormElements from "./pages/Forms/FormElements";
-import BasicTables from "./pages/Tables/BasicTables";
-import Alerts from "./pages/UiElements/Alerts";
-import Avatars from "./pages/UiElements/Avatars";
-import Badges from "./pages/UiElements/Badges";
-import Buttons from "./pages/UiElements/Buttons";
-import Images from "./pages/UiElements/Images";
-import Videos from "./pages/UiElements/Videos";
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import Sales from "./pages/Sales/Sales";
-import AddSale from "./pages/Sales/AddSale";
+
 
 const Dashboard = lazy(() => import("./pages/Dashboard/Home"));
 const Customers = lazy(() => import("./pages/Customer/Customers"));
@@ -36,6 +19,27 @@ const Purchases = lazy(() => import("./pages/Purchase/Purchases"));
 const Categories = lazy(() => import("./pages/Inventory/Categories"));
 const Units = lazy(() => import("./pages/Inventory/Units"));
 const Items = lazy(() => import("./pages/Inventory/Items"));
+const AddPurchase = lazy(() => import("./pages/Purchase/AddPurchase"));
+const EditPurchase = lazy(() => import("./pages/Purchase/EditPurchase"));
+const ViewPurchase = lazy(() => import("./pages/Purchase/ViewPurchase"));
+const UserProfiles = lazy(() => import("./pages/UserProfiles"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const Blank = lazy(() => import("./pages/Blank"));
+const FormElements = lazy(() => import("./pages/Forms/FormElements"));
+const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
+const Alerts = lazy(() => import("./pages/UiElements/Alerts"));
+const Avatars = lazy(() => import("./pages/UiElements/Avatars"));
+const Badges = lazy(() => import("./pages/UiElements/Badges"));
+const Buttons = lazy(() => import("./pages/UiElements/Buttons"));
+const Images = lazy(() => import("./pages/UiElements/Images"));
+const Videos = lazy(() => import("./pages/UiElements/Videos"));
+const LineChart = lazy(() => import("./pages/Charts/LineChart"));
+const BarChart = lazy(() => import("./pages/Charts/BarChart"));
+const Sales = lazy(() => import("./pages/Sales/Sales"));
+const AddSale = lazy(() => import("./pages/Sales/AddSale"));
+const EditSale = lazy(() => import("./pages/Sales/EditSale"));
+const ViewSale = lazy(() => import("./pages/Sales/ViewSale"));
+
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -56,6 +60,8 @@ const AppRoutes = () => {
             { path: "customers", element: <Customers /> },
             { path: "sales", element: <Sales /> },
             { path: "sales/add", element: <AddSale /> },
+            { path: "sales/edit/:id", element: <EditSale /> },
+            { path: "sales/:id", element: <ViewSale /> },
 
             // purchases
             { path: "vendors", element: <Vendors /> },
@@ -98,7 +104,7 @@ const AppRoutes = () => {
 function App() {
   return (
     <>
-      <Toaster richColors position="top-right" closeButton={true} />
+      <Toaster richColors position="top-center" closeButton={true} />
       <Suspense fallback={<div>Loading...</div>}>
         <AppRoutes />
       </Suspense>

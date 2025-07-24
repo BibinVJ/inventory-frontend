@@ -2,6 +2,7 @@
 import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Customer {
   id: number;
@@ -21,9 +22,11 @@ export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted
     try {
       await api.delete(`/customer/${customer.id}`);
       onCustomerDeleted();
+      toast.success('Customer deleted successfully');
       onClose();
     } catch (error) {
       console.error('Error deleting customer:', error);
+      toast.error('Failed to delete customer');
     }
   };
 

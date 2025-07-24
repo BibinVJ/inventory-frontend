@@ -2,6 +2,7 @@
 import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
+import { toast } from 'sonner';
 
 interface Unit {
   id: number;
@@ -23,9 +24,11 @@ export default function DeleteUnitModal({ isOpen, onClose, onUnitDeleted, unit }
     try {
       await api.delete(`/unit/${unit.id}`);
       onUnitDeleted();
+      toast.success('Unit deleted successfully');
       onClose();
     } catch (error) {
       console.error('Error deleting unit:', error);
+      toast.error('Failed to delete unit');
     }
   };
 

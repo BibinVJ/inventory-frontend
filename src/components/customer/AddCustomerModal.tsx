@@ -90,19 +90,19 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <Label>Name <span className="text-red-500">*</span></Label>
-                  <Input type="text" value={name} onChange={(e) => setName(e.target.value)} error={!!errors.name} hint={errors.name} />
+                  <Input type="text" value={name} onChange={(e) => {setName(e.target.value); setErrors({...errors, name: ''})}} error={!!errors.name} hint={errors.name} />
                 </div>
                 <div>
                   <Label>Email</Label>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={!!errors.email} hint={errors.email} />
+                  <Input type="email" value={email} onChange={(e) => {setEmail(e.target.value); setErrors({...errors, email: ''})}} error={!!errors.email} hint={errors.email} />
                 </div>
                 <div>
                   <Label>Phone</Label>
-                  <Input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} error={!!errors.phone} hint={errors.phone} />
+                  <Input type="text" value={phone} onChange={(e) => {setPhone(e.target.value); setErrors({...errors, phone: ''})}} error={!!errors.phone} hint={errors.phone} />
                 </div>
                 <div className="lg:col-span-2">
                   <Label>Address</Label>
-                  <TextArea placeholder="Enter address" value={address} onChange={setAddress} error={!!errors.address} hint={errors.address} />
+                  <TextArea placeholder="Enter address" value={address} onChange={(value) => {setAddress(value); setErrors({...errors, address: ''})}} error={!!errors.address} hint={errors.address} />
                 </div>
                 <div>
                   <Label>Status</Label>

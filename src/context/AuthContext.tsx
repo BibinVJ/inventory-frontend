@@ -10,11 +10,11 @@ import api from "../services/api";
 type User = {
   id: number;
   name: string;
-  first_name: string;
-  last_name: string;
+  // first_name: string;
+  // last_name: string;
   email: string;
   phone: string;
-  avatar: string;
+  profile_image: string;
   address: string;
   city: string;
   state: string;

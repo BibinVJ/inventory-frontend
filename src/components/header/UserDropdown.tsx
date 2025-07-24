@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { Link } from "react-router";
 import { User, Settings, HelpCircle, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -82,7 +81,7 @@ export default function UserDropdown() {
               Edit profile
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -92,7 +91,7 @@ export default function UserDropdown() {
               <Settings className="w-5 h-5" />
               Account settings
             </DropdownItem>
-          </li>
+          </li> */}
           <li>
             <DropdownItem
               onItemClick={closeDropdown}

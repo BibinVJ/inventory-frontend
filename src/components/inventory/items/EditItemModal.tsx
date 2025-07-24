@@ -161,17 +161,17 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
                 <Label>SKU <span className="text-red-500">*</span></Label>
-                <Input type="text" value={sku} onChange={(e) => setSku(e.target.value)} error={!!errors.sku} hint={errors.sku} />
+                <Input type="text" value={sku} onChange={(e) => {setSku(e.target.value); setErrors({...errors, sku: ''})}} error={!!errors.sku} hint={errors.sku} />
               </div>
               <div>
                 <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={(e) => setName(e.target.value)} error={!!errors.name} hint={errors.name} />
+                <Input type="text" value={name} onChange={(e) => {setName(e.target.value); setErrors({...errors, name: ''})}} error={!!errors.name} hint={errors.name} />
               </div>
               <div>
                 <Label>Category <span className="text-red-500">*</span></Label>
                 <Select
                   options={categories.map(cat => ({ value: String(cat.id), label: cat.name }))}
-                  onChange={setCategoryId}
+                  onChange={(value) => {setCategoryId(value); setErrors({...errors, category_id: ''})}}
                   defaultValue={categoryId}
                   placeholder="Select a category"
                   error={!!errors.category_id}
@@ -182,7 +182,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
                 <Label>Unit <span className="text-red-500">*</span></Label>
                 <Select
                   options={units.map(unit => ({ value: String(unit.id), label: `${unit.name} (${unit.code})` }))}
-                  onChange={setUnitId}
+                  onChange={(value) => {setUnitId(value); setErrors({...errors, unit_id: ''})}}
                   defaultValue={unitId}
                   placeholder="Select a unit"
                   error={!!errors.unit_id}

@@ -25,6 +25,9 @@ interface Item {
     stock_on_hand: number;
     non_expired_stock: number;
     is_expired_sale_enabled: boolean;
+    unit: {
+        code: string;
+    };
   }
 
 interface SaleItem {
@@ -190,7 +193,7 @@ export default function EditSale() {
       invoice_number: invoiceNumber,
       sale_date: saleDate,
       payment_status: 'paid',
-      items: saleItems.map(({ description, available_stock, ...item }) => item),
+      items: saleItems.map(({ ...item }) => item),
     };
 
     try {
@@ -205,6 +208,16 @@ export default function EditSale() {
         console.error('Error updating sale:', error);
         toast.error('Failed to update sale');
       }
+    }
+  };
+
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
     }
   };
 
@@ -227,7 +240,7 @@ export default function EditSale() {
               <Label>Customer</Label>
               <Select
                 options={customers.map(c => ({ value: String(c.id), label: c.name }))}
-                onChange={setCustomerId}
+                onChange={(value) => { setCustomerId(value); clearError('customer_id'); }}
                 defaultValue={customerId}
                 placeholder="Select a customer"
                 error={!!getErrorMessage('customer_id')}
@@ -239,7 +252,7 @@ export default function EditSale() {
               <Input
                 type="text"
                 value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
+                onChange={(e) => { setInvoiceNumber(e.target.value); clearError('invoice_number'); }}
                 error={!!getErrorMessage('invoice_number')}
                 hint={getErrorMessage('invoice_number')}
               />
@@ -248,7 +261,7 @@ export default function EditSale() {
               <DatePicker
                 id="sale_date"
                 label="Sale Date"
-                onChange={(_, dateStr) => setSaleDate(dateStr)}
+                onChange={(_, dateStr) => { setSaleDate(dateStr); clearError('sale_date'); }}
                 defaultDate={saleDate}
                 error={!!getErrorMessage('sale_date')}
                 hint={getErrorMessage('sale_date')}
@@ -269,7 +282,7 @@ export default function EditSale() {
               <button
                 type="button"
                 onClick={() => handleRemoveItem(index)}
-                className="absolute p-1 text-red-500 bg-white rounded-full -top-2 -right-2 hover:bg-red-100"
+                className="absolute p-1 text-red-500 bg-red-100 rounded-full -top-2 -right-2 hover:bg-red-300"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
@@ -278,7 +291,7 @@ export default function EditSale() {
                   <Label>Item</Label>
                   <Select
                     options={items.map(i => ({ value: String(i.id), label: i.name }))}
-                    onChange={(value) => handleItemChange(index, 'item_id', value)}
+                    onChange={(value) => { handleItemChange(index, 'item_id', value); clearError(`items.${index}.item_id`); }}
                     defaultValue={item.item_id}
                     placeholder="Select an item"
                     error={!!getErrorMessage(`items.${index}.item_id`)}
@@ -287,21 +300,36 @@ export default function EditSale() {
                 </div>
                 <div>
                   <Label>Quantity</Label>
-                  <Input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => handleItemChange(index, 'quantity', Number(e.target.value))}
-                    error={!!getErrorMessage(`items.${index}.quantity`)}
-                    hint={getErrorMessage(`items.${index}.quantity`)}
-                  />
-                  {item.item_id && <p className="text-sm text-gray-500 mt-1">Available: {item.available_stock}</p>}
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => { handleItemChange(index, 'quantity', Number(e.target.value)); clearError(`items.${index}.quantity`); }}
+                      error={!!getErrorMessage(`items.${index}.quantity`)}
+                      hint={getErrorMessage(`items.${index}.quantity`)}
+                    />
+                    {item.item_id && (
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                        {items.find(i => i.id === Number(item.item_id))?.unit.code}
+                      </span>
+                    )}
+                  </div>
+                  {item.item_id && (
+                    <p className={`text-sm mt-1 ${
+                        item.available_stock === 0 ? 'text-red-500' :
+                        item.available_stock < 10 ? 'text-orange-500' :
+                        'text-gray-500'
+                    }`}>
+                        Available: {item.available_stock}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label>Unit Price</Label>
                   <Input
                     type="number"
                     value={item.unit_price}
-                    onChange={(e) => handleItemChange(index, 'unit_price', Number(e.target.value))}
+                    onChange={(e) => { handleItemChange(index, 'unit_price', Number(e.target.value)); clearError(`items.${index}.unit_price`); }}
                     error={!!getErrorMessage(`items.${index}.unit_price`)}
                     hint={getErrorMessage(`items.${index}.unit_price`)}
                   />
@@ -317,8 +345,25 @@ export default function EditSale() {
                     />
                 </div>
               </div>
+              <div className="flex justify-end mt-4">
+                <div className="flex items-center space-x-4">
+                    <span className="font-semibold dark:text-gray-400">Total:</span>
+                    <span className="font-bold dark:text-white">
+                        {(item.quantity * item.unit_price).toFixed(2)}
+                    </span>
+                </div>
+              </div>
             </div>
           ))}
+
+          <div className="flex justify-end mt-6">
+            <div className="flex items-center space-x-4">
+                <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
+                <span className="text-lg font-bold dark:text-white">
+                    {saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0).toFixed(2)}
+                </span>
+            </div>
+          </div>
 
           <div className="flex justify-end mt-6">
             <Button type="submit">

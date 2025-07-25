@@ -12,13 +12,18 @@ export const login = async (email: string, password: string) => {
 export const logout = async () => {
   // Notify the server about logout
   try {
-    await api.post('/logout');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      await api.post('/logout');
+    }
   } catch (error) {
     console.error("Logout failed on server:", error);
   } finally {
     // Always clear local data
     localStorage.removeItem("user");
     sessionStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     // Remove the authorization header
     delete api.defaults.headers.common["Authorization"];
   }

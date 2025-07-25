@@ -1,28 +1,78 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import ChartTab from "../common/ChartTab";
+import { useState } from "react";
 
-export default function StatisticsChart({ data }: { data: any}) {
+type Period = "monthly" | "quarterly" | "annually";
+
+export default function StatisticsChart({ data }: { data: any }) {
+  const [period, setPeriod] = useState<Period>("monthly");
+
+  const filterDataByPeriod = (items: any[], period: Period) => {
+    const now = new Date();
+    return items.filter(item => {
+      const itemDate = new Date(item.date);
+      switch (period) {
+        case "monthly":
+          return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+        case "quarterly":
+          const currentQuarter = Math.floor(now.getMonth() / 3);
+          const itemQuarter = Math.floor(itemDate.getMonth() / 3);
+          return itemQuarter === currentQuarter && itemDate.getFullYear() === now.getFullYear();
+        case "annually":
+          return itemDate.getFullYear() === now.getFullYear();
+        default:
+          return true;
+      }
+    });
+  };
+
+  const filteredSales = filterDataByPeriod(data?.sales || [], period);
+  const filteredPurchases = filterDataByPeriod(data?.purchases || [], period);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+  };
+
+  const allDates = [
+    ...filteredSales.map((s: any) => s.date),
+    ...filteredPurchases.map((p: any) => p.date),
+  ];
+
+  const uniqueSortedDates = [...new Set(allDates)].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+  const categories = uniqueSortedDates.map(date => formatDate(date));
+
+  const salesMap = new Map(filteredSales.map((s: any) => [formatDate(s.date), s.total]));
+  const purchasesMap = new Map(filteredPurchases.map((p: any) => [formatDate(p.date), p.total]));
+
+  const salesData = categories.map(date => salesMap.get(date) || 0);
+  const purchasesData = categories.map(date => purchasesMap.get(date) || 0);
+
   const options: ApexOptions = {
     legend: {
-      show: false, // Hide legend
+      show: true,
       position: "top",
       horizontalAlign: "left",
+      fontFamily: "Outfit, sans-serif",
+      markers: {
+        radius: 12,
+      }
     },
-    colors: ["#465FFF", "#9CB9FF"], // Define line colors
+    colors: ["#465FFF", "#9CB9FF"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       height: 310,
-      type: "line", // Set the chart type to 'line'
+      type: "line",
       toolbar: {
-        show: false, // Hide chart toolbar
+        show: false,
       },
     },
     stroke: {
-      curve: "straight", // Define the line style (straight, smooth, or step)
-      width: [2, 2], // Line width for each dataset
+      curve: "smooth",
+      width: [2, 2],
     },
-
     fill: {
       type: "gradient",
       gradient: {
@@ -31,69 +81,56 @@ export default function StatisticsChart({ data }: { data: any}) {
       },
     },
     markers: {
-      size: 0, // Size of the marker points
-      strokeColors: "#fff", // Marker border color
+      size: 0,
+      strokeColors: "#fff",
       strokeWidth: 2,
       hover: {
-        size: 6, // Marker size on hover
+        size: 6,
       },
     },
     grid: {
       xaxis: {
         lines: {
-          show: false, // Hide grid lines on x-axis
+          show: false,
         },
       },
       yaxis: {
         lines: {
-          show: true, // Show grid lines on y-axis
+          show: true,
         },
       },
     },
     dataLabels: {
-      enabled: false, // Disable data labels
+      enabled: false,
     },
     tooltip: {
-      enabled: true, // Enable tooltip
+      enabled: true,
       x: {
-        format: "dd MMM yyyy", // Format for x-axis tooltip
+        format: "dd MMM yyyy",
       },
     },
     xaxis: {
-      type: "category", // Category-based x-axis
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      type: "category",
+      categories: categories,
       axisBorder: {
-        show: false, // Hide x-axis border
+        show: false,
       },
       axisTicks: {
-        show: false, // Hide x-axis ticks
+        show: false,
       },
       tooltip: {
-        enabled: false, // Disable tooltip for x-axis points
+        enabled: false,
       },
     },
     yaxis: {
       labels: {
         style: {
-          fontSize: "12px", // Adjust font size for y-axis labels
-          colors: ["#6B7280"], // Color of the labels
+          fontSize: "12px",
+          colors: ["#6B7280"],
         },
       },
       title: {
-        text: "", // Remove y-axis title
+        text: "",
         style: {
           fontSize: "0px",
         },
@@ -102,15 +139,16 @@ export default function StatisticsChart({ data }: { data: any}) {
   };
 
   const series = [
-  {
-    name: "Sales",
-    data: data?.sales.map((s: any) => s.total) || [],
-  },
-  {
-    name: "Purchases",
-    data: data?.purchases.map((p: any) => p.total) || [],
-  },
+    {
+      name: "Sales",
+      data: salesData,
+    },
+    {
+      name: "Purchases",
+      data: purchasesData,
+    },
   ];
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
@@ -119,11 +157,11 @@ export default function StatisticsChart({ data }: { data: any}) {
             Statistics
           </h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Target you’ve set for each month
+            Sale and purchase comparison chart
           </p>
         </div>
         <div className="flex items-start w-full gap-3 sm:justify-end">
-          <ChartTab />
+          <ChartTab selectedPeriod={period} onSelectPeriod={setPeriod} />
         </div>
       </div>
 

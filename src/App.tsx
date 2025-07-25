@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "sonner";
 import { useRoutes } from "react-router";
 import "nprogress/nprogress.css";
@@ -10,6 +10,7 @@ import AppLayout from "./layout/AppLayout";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
+import { useAuth } from "./context/AuthContext";
 
 
 const Dashboard = lazy(() => import("./pages/Dashboard/Home"));
@@ -102,6 +103,13 @@ const AppRoutes = () => {
 };
 
 function App() {
+  const { logout } = useAuth();
+  useEffect(() => {
+    const handleLogout = () => logout();
+    window.addEventListener("logout", handleLogout);
+    return () => window.removeEventListener("logout", handleLogout);
+  }, [logout]);
+  
   return (
     <>
       <Toaster richColors position="top-center" closeButton={true} />

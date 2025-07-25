@@ -319,7 +319,6 @@ export default function AddSale() {
                     <Label>Description</Label>
                     <TextArea
                         value={item.description}
-                        readOnly
                         className="bg-gray-100 dark:bg-gray-800"
                     />
                 </div>

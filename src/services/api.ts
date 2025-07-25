@@ -23,6 +23,9 @@ api.interceptors.response.use(response => {
   return response;
 }, error => {
   NProgress.done();
+  if (error.response && error.response.status === 401 && error.config.url !== '/logout') {
+    window.dispatchEvent(new Event('logout'));
+  }
   // if (error.response?.data?.message) {
   //   toast.error(error.response.data.message);
   // }

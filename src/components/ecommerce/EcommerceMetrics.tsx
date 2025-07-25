@@ -7,8 +7,17 @@ import {
   PageIcon,
 } from "../../icons";
 import Badge from "../ui/badge/Badge";
+import { ReactNode } from "react";
 
-const MetricCard = ({ icon, title, value, percentage, trend }) => (
+interface MetricCardProps {
+  icon: ReactNode;
+  title: string;
+  value: string | number;
+  percentage?: number;
+  trend?: "up" | "down";
+}
+
+const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) => (
   <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
     <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
       {icon}
@@ -22,10 +31,12 @@ const MetricCard = ({ icon, title, value, percentage, trend }) => (
           {value}
         </h4>
       </div>
-      <Badge color={trend === "up" ? "success" : "error"}>
-        {trend === "up" ? <ArrowUpIcon /> : <ArrowDownIcon />}
-        {percentage}%
-      </Badge>
+      {trend && percentage && (
+        <Badge color={trend === "up" ? "success" : "error"}>
+          {trend === "up" ? <ArrowUpIcon /> : <ArrowDownIcon />}
+          {percentage}%
+        </Badge>
+      )}
     </div>
   </div>
 );
@@ -37,29 +48,21 @@ export default function EcommerceMetrics({ data }: { data: any }) {
         icon={<DollarLineIcon className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Sales"
         value={`${data?.total_sales_amount ?? 0}`}
-        percentage={11.01}
-        trend="up"
       />
       <MetricCard
         icon={<BoxIconLine className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Purchase"
         value={`${data?.total_purchase_amount ?? 0}`}
-        percentage={9.05}
-        trend="down"
       />
       <MetricCard
         icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Customers"
-        value={data?.total_customers ?? 0}
-        percentage={5.5}
-        trend="up"
+        value={data?.total_customers_count ?? 0}
       />
       <MetricCard
         icon={<PageIcon className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Items"
-        value={data?.total_items ?? 0}
-        percentage={2.3}
-        trend="up"
+        value={data?.total_items_count ?? 0}
       />
     </div>
   );

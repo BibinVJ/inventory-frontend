@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -8,17 +7,7 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { useNavigate } from 'react-router';
-
-interface Sale {
-  id: number;
-  invoice_number: string;
-  sale_date: string;
-  customer: {
-    name: string;
-  };
-  total_amount: number;
-  payment_status: string;
-}
+import { getSales, Sale } from '../../services/SaleService';
 
 export default function Sales() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -34,8 +23,7 @@ export default function Sales() {
 
   const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await api.get(`/sale?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
-      const { data, last_page, current_page, from, to, total } = response.data.results;
+      const { data, last_page, current_page, from, to, total } = await getSales(page, limit, sortCol, sortDir);
       setSales(data);
       setTotalPages(last_page);
       setCurrentPage(current_page);

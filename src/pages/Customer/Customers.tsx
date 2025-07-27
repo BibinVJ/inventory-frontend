@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -10,15 +9,7 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  is_active: boolean;
-}
+import { getCustomers, Customer } from '../../services/CustomerService';
 
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -34,8 +25,7 @@ export default function Customers() {
 
   const fetchCustomers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await api.get(`/customer?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
-      const { data, last_page, current_page, from, to, total } = response.data.results;
+      const { data, last_page, current_page, from, to, total } = await getCustomers(page, limit, sortCol, sortDir);
       setCustomers(data);
       setTotalPages(last_page);
       setCurrentPage(current_page);

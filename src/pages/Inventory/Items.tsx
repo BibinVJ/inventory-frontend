@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -9,24 +8,7 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-
-interface Item {
-  id: number;
-  sku: string;
-  name: string;
-  description: string;
-  is_active: boolean;
-  category: {
-    id: number;
-    name: string;
-  };
-  unit: {
-    id: number;
-    name: string;
-    code: string;
-  };
-  type: string;
-}
+import { getItems, Item } from '../../services/ItemService';
 
 export default function Items() {
   const [items, setItems] = useState<Item[]>([]);
@@ -42,8 +24,7 @@ export default function Items() {
 
   const fetchItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await api.get(`/item?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
-      const { data, last_page, current_page, from, to, total } = response.data.results;
+      const { data, last_page, current_page, from, to, total } = await getItems(page, limit, sortCol, sortDir);
       setItems(data);
       setTotalPages(last_page);
       setCurrentPage(current_page);

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -12,23 +11,9 @@ import { useNavigate, useParams } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
-
-interface Customer {
-  id: number;
-  name: string;
-}
-
-interface Item {
-    id: number;
-    name: string;
-    description: string;
-    stock_on_hand: number;
-    non_expired_stock: number;
-    is_expired_sale_enabled: boolean;
-    unit: {
-        code: string;
-    };
-  }
+import { getCustomers, Customer } from '../../services/CustomerService';
+import { getItems, getItem, Item } from '../../services/ItemService';
+import { getSale, updateSale } from '../../services/SaleService';
 
 interface SaleItem {
   id?: number;
@@ -44,7 +29,7 @@ interface ApiError {
 }
 
 export default function EditSale() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -55,30 +40,39 @@ export default function EditSale() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCustomers();
-    fetchItems();
-    fetchSale();
+    fetchInitialData();
   }, [id]);
 
-  const fetchSale = async () => {
+  const fetchInitialData = async () => {
     try {
-      const response = await api.get(`/sale/${id}`);
-      const { customer, invoice_number, sale_date, items } = response.data.results;
+      const [customerResponse, itemResponse, saleResponse] = await Promise.all([
+        getCustomers(1, 10, 'created_at', 'desc', true),
+        getItems(1, 10, 'created_at', 'desc', true),
+        getSale(id!)
+      ]);
+      // @ts-ignore
+      setCustomers(customerResponse);
+      // @ts-ignore
+      setItems(itemResponse);
+
+      const { customer, invoice_number, sale_date, items } = saleResponse;
       setCustomerId(String(customer.id));
       setInvoiceNumber(invoice_number);
       setSaleDate(sale_date);
 
       const saleItemsPromises = items.map(async (item: any) => {
-        const itemDetailsResponse = await api.get(`/item/${item.item.id}`);
-        const itemDetails: Item = itemDetailsResponse.data.results;
+        const itemDetails = await getItem(item.item.id);
         return {
           id: item.id,
           item_id: String(item.item.id),
           quantity: item.quantity,
           unit_price: item.unit_price,
           description: itemDetails.description,
+          // @ts-ignore
           available_stock: itemDetails.is_expired_sale_enabled
+          // @ts-ignore
             ? itemDetails.stock_on_hand
+          // @ts-ignore
             : itemDetails.non_expired_stock,
         };
       });
@@ -87,25 +81,7 @@ export default function EditSale() {
       setSaleItems(resolvedSaleItems);
 
     } catch (error) {
-      console.error('Error fetching sale:', error);
-    }
-  };
-
-  const fetchCustomers = async () => {
-    try {
-      const response = await api.get('/customer?unpaginated=1');
-      setCustomers(response.data.results);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
-  };
-
-  const fetchItems = async () => {
-    try {
-      const response = await api.get('/item?unpaginated=1');
-      setItems(response.data.results);
-    } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Error fetching initial data:', error);
     }
   };
 
@@ -117,21 +93,18 @@ export default function EditSale() {
     const newItems = [...saleItems];
     newItems[index] = { ...newItems[index], [field]: value };
 
-    if (field === 'item_id') {
-        if (value) {
-            try {
-              const response = await api.get(`/item/${value}`);
-              const itemDetails: Item = response.data.results;
-              newItems[index].description = itemDetails.description;
-              newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-                ? itemDetails.stock_on_hand
-                : itemDetails.non_expired_stock;
-            } catch (error) {
-              console.error('Error fetching item details:', error);
-              newItems[index].description = '';
-              newItems[index].available_stock = 0;
-            }
-        } else {
+    if (field === 'item_id' && value) {
+        try {
+            const itemDetails = await getItem(value);
+            newItems[index].description = itemDetails.description;
+            // @ts-ignore
+            newItems[index].available_stock = itemDetails.is_expired_sale_enabled
+            // @ts-ignore
+            ? itemDetails.stock_on_hand
+            // @ts-ignore
+            : itemDetails.non_expired_stock;
+        } catch (error) {
+            console.error('Error fetching item details:', error);
             newItems[index].description = '';
             newItems[index].available_stock = 0;
         }
@@ -149,32 +122,16 @@ export default function EditSale() {
   const validateForm = () => {
     const newErrors: ApiError = {};
 
-    if (!customerId) {
-      newErrors.customer_id = ['Customer is required.'];
-    }
-    if (!invoiceNumber.trim()) {
-      newErrors.invoice_number = ['Invoice number is required.'];
-    }
-    if (!saleDate) {
-      newErrors.sale_date = ['Sale date is required.'];
-    }
-    if (saleItems.length === 0) {
-      newErrors.items = ['At least one item is required.'];
-    }
+    if (!customerId) newErrors.customer_id = ['Customer is required.'];
+    if (!invoiceNumber.trim()) newErrors.invoice_number = ['Invoice number is required.'];
+    if (!saleDate) newErrors.sale_date = ['Sale date is required.'];
+    if (saleItems.length === 0) newErrors.items = ['At least one item is required.'];
 
     saleItems.forEach((item, index) => {
-      if (!item.item_id) {
-        newErrors[`items.${index}.item_id`] = ['Item is required.'];
-      }
-      if (item.quantity <= 0) {
-        newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      }
-      if (item.quantity > item.available_stock) {
-        newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
-      }
-      if (item.unit_price < 0) {
-        newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
-      }
+      if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
+      if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
+      if (item.quantity > item.available_stock) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
+      if (item.unit_price < 0) newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
     });
 
     setErrors(newErrors);
@@ -197,7 +154,7 @@ export default function EditSale() {
     };
 
     try {
-      await api.put(`/sale/${id}`, payload);
+      await updateSale(id!, payload);
       toast.success('Sale updated successfully');
       navigate('/sales');
     } catch (error: any) {
@@ -221,9 +178,7 @@ export default function EditSale() {
     }
   };
 
-  const getErrorMessage = (field: string) => {
-    return errors[field] ? errors[field][0] : '';
-  }
+  const getErrorMessage = (field: string) => errors[field]?.[0] || '';
 
   return (
     <>

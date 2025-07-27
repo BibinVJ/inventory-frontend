@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
@@ -7,6 +6,7 @@ import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
+import { addUnit } from '../../../services/UnitService';
 
 interface Props {
   isOpen: boolean;
@@ -46,7 +46,7 @@ export default function AddUnitModal({ isOpen, onClose, onUnitAdded }: Props) {
     }
 
     try {
-      await api.post(`/unit`, { name, code, description, is_active: isActive });
+      await addUnit({ name, code, description, is_active: isActive });
       onUnitAdded();
       toast.success('Unit added successfully');
       handleClose();

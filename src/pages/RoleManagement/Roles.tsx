@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
-import PurchaseTable from '../../components/purchase/PurchaseTable';
+import RoleTable from '../../components/role/RoleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
+import { getRoles, Role } from '../../services/RoleService';
 import { useNavigate } from 'react-router';
-import { getPurchases, Purchase } from '../../services/PurchaseService';
 
-export default function Purchases() {
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
+export default function Roles() {
+  const [roles, setRoles] = useState<Role[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -22,22 +22,22 @@ export default function Purchases() {
   const [sortDirection, setSortDirection] = useState('desc');
   const navigate = useNavigate();
 
-  const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchRoles = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getPurchases(page, limit, sortCol, sortDir);
-      setPurchases(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getRoles(page, limit, sortCol, sortDir);
+      setRoles(response.data);
+      setTotalPages(response.last_page);
+      setCurrentPage(response.current_page);
+      setFrom(response.from);
+      setTo(response.to);
+      setTotal(response.total);
     } catch (error) {
-      console.error('Error fetching purchases:', error);
+      console.error('Error fetching roles:', error);
     }
   };
 
   useEffect(() => {
-    fetchPurchases(currentPage, perPage, sortBy, sortDirection);
+    fetchRoles(currentPage, perPage, sortBy, sortDirection);
   }, [currentPage, perPage, sortBy, sortDirection]);
 
   const handlePageChange = (page: number) => {
@@ -61,10 +61,10 @@ export default function Purchases() {
   return (
     <>
       <PageMeta
-        title="Purchases | Pharmacy Manager"
-        description="List of purchases"
+        title="Roles | Pharmacy Manager"
+        description="List of roles"
       />
-      <PageBreadcrumb pageTitle="Purchases" />
+      <PageBreadcrumb pageTitle="Roles" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
@@ -81,15 +81,15 @@ export default function Purchases() {
             searchable={false}
           />
         </div>
-        <Button onClick={() => navigate('/purchases/add')}>
-          Add Purchase
+        <Button onClick={() => navigate('/roles/add')}>
+          Add Role
         </Button>
       </div>
       <div className="space-y-6">
         <ComponentCard>
-          <PurchaseTable
-            data={purchases}
-            onAction={() => fetchPurchases(currentPage, perPage, sortBy, sortDirection)}
+          <RoleTable
+            data={roles}
+            onAction={() => fetchRoles(currentPage, perPage, sortBy, sortDirection)}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
@@ -109,3 +109,4 @@ export default function Purchases() {
     </>
   );
 }
+

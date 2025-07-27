@@ -1,0 +1,55 @@
+
+import api from './api';
+
+export interface Item {
+  id: number;
+  sku: string;
+  name:string;
+  description: string;
+  is_active: boolean;
+  category: {
+    id: number;
+    name: string;
+  };
+  unit: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  type: string;
+}
+
+export interface ItemApiResponse {
+  data: Item[];
+  last_page: number;
+  current_page: number;
+  from: number;
+  to: number;
+  total: number;
+}
+
+export const getItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<ItemApiResponse> => {
+  const url = unpaginated ? '/item?unpaginated=1' : `/item?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;
+  const response = await api.get(url);
+  return response.data.results;
+};
+
+export const getItem = async (id: string): Promise<Item> => {
+    const response = await api.get(`/item/${id}`);
+    return response.data.results;
+};
+
+export const addItem = async (item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; }) => {
+    const response = await api.post('/item', item);
+    return response.data;
+};
+
+export const updateItem = async (id: number, item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; }) => {
+    const response = await api.put(`/item/${id}`, item);
+    return response.data;
+};
+
+export const deleteItem = async (id: number) => {
+    const response = await api.delete(`/item/${id}`);
+    return response.data;
+};

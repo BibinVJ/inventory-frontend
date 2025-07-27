@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
@@ -8,6 +7,7 @@ import Switch from '../form/switch/Switch';
 import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { addCustomer } from '../../services/CustomerService';
 
 interface Props {
   isOpen: boolean;
@@ -59,7 +59,7 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
     }
 
     try {
-      await api.post(`/customer`, { name, email, phone, address, is_active: isActive });
+      await addCustomer({ name, email, phone, address, is_active: isActive });
       onCustomerAdded();
       toast.success('Customer added successfully');
       handleClose();

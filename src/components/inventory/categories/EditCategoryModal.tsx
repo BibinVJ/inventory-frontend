@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
@@ -8,6 +7,7 @@ import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
+import { updateCategory } from '../../../services/CategoryService';
 
 interface Category {
   id: number;
@@ -45,7 +45,7 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
     }
     
     try {
-      await api.put(`/category/${category.id}`, { name, description, is_active: isActive });
+      await updateCategory(category.id, { name, description, is_active: isActive });
       onCategoryUpdated();
       toast.success('Category updated successfully');
       onClose();

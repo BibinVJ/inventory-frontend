@@ -1,4 +1,5 @@
 import { User } from "../../types";
+import { formatKebabCase } from "../../utils/string";
 
 interface UserMetaCardProps {
   user: User | null;
@@ -19,7 +20,7 @@ export default function UserMetaCard({ user, onEdit }: UserMetaCardProps) {
             </h4>
             <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {user?.role || 'role'}
+                {user?.role ? formatKebabCase(user.role.name) : 'role'}
               </p>
               <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
             </div>

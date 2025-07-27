@@ -1,7 +1,7 @@
-import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
+import { deleteCategory } from '../../../services/CategoryService';
 
 interface Category {
   id: number;
@@ -21,7 +21,7 @@ export default function DeleteCategoryModal({ isOpen, onClose, onCategoryDeleted
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/category/${category.id}`);
+      await deleteCategory(category.id);
       onCategoryDeleted();
       toast.success('Category deleted successfully');
       onClose();

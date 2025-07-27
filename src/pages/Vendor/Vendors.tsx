@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -10,15 +9,7 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-
-interface Vendor {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  is_active: boolean;
-}
+import { getVendors, Vendor } from '../../services/VendorService';
 
 export default function Vendors() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -34,8 +25,7 @@ export default function Vendors() {
 
   const fetchVendors = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const response = await api.get(`/vendor?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
-      const { data, last_page, current_page, from, to, total } = response.data.results;
+      const { data, last_page, current_page, from, to, total } = await getVendors(page, limit, sortCol, sortDir);
       setVendors(data);
       setTotalPages(last_page);
       setCurrentPage(current_page);

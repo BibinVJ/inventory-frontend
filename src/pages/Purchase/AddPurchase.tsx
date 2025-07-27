@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -13,20 +12,9 @@ import { useNavigate } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
-
-interface Vendor {
-  id: number;
-  name: string;
-}
-
-interface Item {
-  id: number;
-  name: string;
-  type: string;
-  unit: {
-    code: string;
-  };
-}
+import { getVendors, Vendor } from '../../services/VendorService';
+import { getItems, Item } from '../../services/ItemService';
+import { getNextPurchaseInvoiceNumber, addPurchase } from '../../services/PurchaseService';
 
 interface PurchaseItem {
   item_id: string;
@@ -55,37 +43,25 @@ export default function AddPurchase() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchVendors();
-    fetchItems();
-    fetchNextInvoiceNumber();
+    fetchInitialData();
   }, []);
 
-  const fetchNextInvoiceNumber = async () => {
+  const fetchInitialData = async () => {
     try {
-      const response = await api.get('/purchase/next-invoice-number');
-      if (response.data.results) {
-        setInvoiceNumber(response.data.results.invoice_number);
+      const [vendorResponse, itemResponse, invoiceResponse] = await Promise.all([
+        getVendors(1, 10, 'created_at', 'desc', true),
+        getItems(1, 10, 'created_at', 'desc', true),
+        getNextPurchaseInvoiceNumber()
+      ]);
+      // @ts-ignore
+      setVendors(vendorResponse);
+      // @ts-ignore
+      setItems(itemResponse);
+      if (invoiceResponse) {
+        setInvoiceNumber(invoiceResponse.invoice_number);
       }
     } catch (error) {
-      console.error('Error fetching next invoice number:', error);
-    }
-  };
-
-  const fetchVendors = async () => {
-    try {
-      const response = await api.get('/vendor?unpaginated=1');
-      setVendors(response.data.results);
-    } catch (error) {
-      console.error('Error fetching vendors:', error);
-    }
-  };
-
-  const fetchItems = async () => {
-    try {
-      const response = await api.get('/item?unpaginated=1');
-      setItems(response.data.results);
-    } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Error fetching initial data:', error);
     }
   };
 
@@ -112,40 +88,20 @@ export default function AddPurchase() {
   const validateForm = () => {
     const newErrors: ApiError = {};
 
-    if (!vendorId) {
-      newErrors.vendor_id = ['Vendor is required.'];
-    }
-    if (!invoiceNumber.trim()) {
-      newErrors.invoice_number = ['Invoice number is required.'];
-    }
-    if (!purchaseDate) {
-      newErrors.purchase_date = ['Purchase date is required.'];
-    }
-    if (purchaseItems.length === 0) {
-      newErrors.items = ['At least one item is required.'];
-    }
+    if (!vendorId) newErrors.vendor_id = ['Vendor is required.'];
+    if (!invoiceNumber.trim()) newErrors.invoice_number = ['Invoice number is required.'];
+    if (!purchaseDate) newErrors.purchase_date = ['Purchase date is required.'];
+    if (purchaseItems.length === 0) newErrors.items = ['At least one item is required.'];
 
     purchaseItems.forEach((item, index) => {
         const selectedItem = items.find(i => i.id === Number(item.item_id));
-      if (!item.item_id) {
-        newErrors[`items.${index}.item_id`] = ['Item is required.'];
-      }
-      if (!item.batch_number.trim()) {
-        newErrors[`items.${index}.batch_number`] = ['Batch number is required.'];
-      }
-      if (item.quantity <= 0) {
-        newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      }
-      if (item.unit_cost < 0) {
-        newErrors[`items.${index}.unit_cost`] = ['Unit cost cannot be negative.'];
-      }
+      if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
+      if (!item.batch_number.trim()) newErrors[`items.${index}.batch_number`] = ['Batch number is required.'];
+      if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
+      if (item.unit_cost < 0) newErrors[`items.${index}.unit_cost`] = ['Unit cost cannot be negative.'];
       if (selectedItem && selectedItem.type === 'product') {
-        if (!item.manufacture_date) {
-            newErrors[`items.${index}.manufacture_date`] = ['MFG date is required.'];
-        }
-        if (!item.expiry_date) {
-            newErrors[`items.${index}.expiry_date`] = ['Expiry date is required.'];
-        }
+        if (!item.manufacture_date) newErrors[`items.${index}.manufacture_date`] = ['MFG date is required.'];
+        if (!item.expiry_date) newErrors[`items.${index}.expiry_date`] = ['Expiry date is required.'];
       }
     });
 
@@ -161,7 +117,7 @@ export default function AddPurchase() {
     }
 
     try {
-      await api.post('/purchase', {
+      await addPurchase({
         vendor_id: vendorId,
         invoice_number: invoiceNumber,
         purchase_date: purchaseDate,
@@ -190,9 +146,7 @@ export default function AddPurchase() {
     }
   };
 
-  const getErrorMessage = (field: string) => {
-    return errors[field] ? errors[field][0] : '';
-  }
+  const getErrorMessage = (field: string) => errors[field]?.[0] || '';
 
   const isProduct = (itemId: string) => {
     const item = items.find(i => i.id === Number(itemId));

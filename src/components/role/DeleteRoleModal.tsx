@@ -2,31 +2,27 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteVendor } from '../../services/VendorService';
-
-interface Vendor {
-  id: number;
-  name: string;
-}
+import { deleteRole } from '../../services/RoleService';
+import { Role } from '../../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onVendorDeleted: () => void;
-  vendor: Vendor;
+  onRoleDeleted: () => void;
+  role: Role;
 }
 
-export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, vendor }: Props) {
+export default function DeleteRoleModal({ isOpen, onClose, onRoleDeleted, role }: Props) {
 
   const handleDelete = async () => {
     try {
-      await deleteVendor(vendor.id);
-      onVendorDeleted();
-      toast.success('Vendor deleted successfully');
+      await deleteRole(role.id);
+      onRoleDeleted();
+      toast.success('Role deleted successfully');
       onClose();
     } catch (error) {
-      console.error('Error deleting vendor:', error);
-      toast.error('Failed to delete vendor');
+      console.error('Error deleting role:', error);
+      toast.error('Failed to delete role');
     }
   };
 
@@ -54,10 +50,10 @@ export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, ve
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Vendor
+            Delete Role
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the vendor "{vendor?.name}"? This action cannot be undone.
+            Are you sure you want to delete the role "{role?.name}"? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

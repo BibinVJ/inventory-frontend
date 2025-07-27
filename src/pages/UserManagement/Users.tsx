@@ -3,15 +3,18 @@ import { useEffect, useState } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
-import PurchaseTable from '../../components/purchase/PurchaseTable';
+import UserTable from '../../components/user/UserTable';
+import AddUserModal from '../../components/user/AddUserModal';
+import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { useNavigate } from 'react-router';
-import { getPurchases, Purchase } from '../../services/PurchaseService';
+import { User } from '../../types';
+import { getUsers } from '../../services/UserService';
 
-export default function Purchases() {
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
+export default function Users() {
+  const [users, setUsers] = useState<User[]>([]);
+  const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -20,24 +23,23 @@ export default function Purchases() {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
-  const navigate = useNavigate();
 
-  const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
+  const fetchUsers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getPurchases(page, limit, sortCol, sortDir);
-      setPurchases(data);
+      const { data, last_page, current_page, from, to, total } = await getUsers(page, limit, sortCol, sortDir);
+      setUsers(data);
       setTotalPages(last_page);
       setCurrentPage(current_page);
       setFrom(from);
       setTo(to);
       setTotal(total);
     } catch (error) {
-      console.error('Error fetching purchases:', error);
+      console.error('Error fetching users:', error);
     }
   };
 
   useEffect(() => {
-    fetchPurchases(currentPage, perPage, sortBy, sortDirection);
+    fetchUsers(currentPage, perPage, sortBy, sortDirection);
   }, [currentPage, perPage, sortBy, sortDirection]);
 
   const handlePageChange = (page: number) => {
@@ -61,10 +63,10 @@ export default function Purchases() {
   return (
     <>
       <PageMeta
-        title="Purchases | Pharmacy Manager"
-        description="List of purchases"
+        title="Users | Pharmacy Manager"
+        description="List of users"
       />
-      <PageBreadcrumb pageTitle="Purchases" />
+      <PageBreadcrumb pageTitle="Users" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <label htmlFor="perPage" className="text-sm font-medium text-gray-700">Per Page:</label>
@@ -81,15 +83,15 @@ export default function Purchases() {
             searchable={false}
           />
         </div>
-        <Button onClick={() => navigate('/purchases/add')}>
-          Add Purchase
+        <Button onClick={openModal}>
+          Add User
         </Button>
       </div>
       <div className="space-y-6">
-        <ComponentCard>
-          <PurchaseTable
-            data={purchases}
-            onAction={() => fetchPurchases(currentPage, perPage, sortBy, sortDirection)}
+        <ComponentCard title="Users">
+          <UserTable
+            data={users}
+            onAction={() => fetchUsers(currentPage, perPage, sortBy, sortDirection)}
             onSort={handleSort}
             sortBy={sortBy}
             sortDirection={sortDirection}
@@ -106,6 +108,7 @@ export default function Purchases() {
           />
         </ComponentCard>
       </div>
+      <AddUserModal isOpen={isOpen} onClose={closeModal} onUserAdded={() => fetchUsers(1, perPage)} />
     </>
   );
 }

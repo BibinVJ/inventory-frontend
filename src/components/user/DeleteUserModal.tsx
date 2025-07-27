@@ -2,31 +2,27 @@
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
-import { deleteVendor } from '../../services/VendorService';
-
-interface Vendor {
-  id: number;
-  name: string;
-}
+import { deleteUser } from '../../services/UserService';
+import { User } from '../../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onVendorDeleted: () => void;
-  vendor: Vendor;
+  onUserDeleted: () => void;
+  user: User;
 }
 
-export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, vendor }: Props) {
+export default function DeleteUserModal({ isOpen, onClose, onUserDeleted, user }: Props) {
 
   const handleDelete = async () => {
     try {
-      await deleteVendor(vendor.id);
-      onVendorDeleted();
-      toast.success('Vendor deleted successfully');
+      await deleteUser(user.id);
+      onUserDeleted();
+      toast.success('User deleted successfully');
       onClose();
     } catch (error) {
-      console.error('Error deleting vendor:', error);
-      toast.error('Failed to delete vendor');
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
     }
   };
 
@@ -54,10 +50,10 @@ export default function DeleteVendorModal({ isOpen, onClose, onVendorDeleted, ve
             </svg>
           </div>
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Delete Vendor
+            Delete User
           </h4>
           <p className="mb-6 text-gray-500 dark:text-gray-400">
-            Are you sure you want to delete the vendor "{vendor?.name}"? This action cannot be undone.
+            Are you sure you want to delete the user "{user?.name}"? This action cannot be undone.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
@@ -8,6 +7,7 @@ import Switch from '../form/switch/Switch';
 import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { updateCustomer } from '../../services/CustomerService';
 
 interface Customer {
   id: number;
@@ -65,7 +65,7 @@ export default function EditCustomerModal({ isOpen, onClose, onCustomerUpdated, 
     }
 
     try {
-      await api.put(`/customer/${customer.id}`, { name, email, phone, address, is_active: isActive });
+      await updateCustomer(customer.id, { name, email, phone, address, is_active: isActive });
       onCustomerUpdated();
       toast.success('Customer updated successfully');
       onClose();

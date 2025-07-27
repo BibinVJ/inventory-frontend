@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
@@ -8,6 +7,9 @@ import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import Select from '../../form/Select';
 import { toast } from 'sonner';
+import { updateItem } from '../../../services/ItemService';
+import { getCategories, Category } from '../../../services/CategoryService';
+import { getUnits, Unit } from '../../../services/UnitService';
 
 interface Item {
   id: number;
@@ -24,17 +26,6 @@ interface Item {
     name: string;
   };
   type: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Unit {
-    id: number;
-    name: string;
-    code: string;
 }
 
 interface Props {
@@ -77,8 +68,9 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/category?unpaginated=1');
-      setCategories(response.data.results);
+      const response = await getCategories(1, 10, 'created_at', 'desc', true);
+      // @ts-ignore
+      setCategories(response);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -86,8 +78,9 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
 
   const fetchUnits = async () => {
     try {
-      const response = await api.get('/unit?unpaginated=1');
-      setUnits(response.data.results);
+      const response = await getUnits(1, 10, 'created_at', 'desc', true);
+      // @ts-ignore
+      setUnits(response);
     } catch (error) {
       console.error('Error fetching units:', error);
     }
@@ -122,7 +115,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
     }
 
     try {
-      await api.put(`/item/${item.id}`, {
+      await updateItem(item.id, {
         sku,
         name,
         category_id: categoryId,

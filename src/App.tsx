@@ -40,6 +40,10 @@ const Sales = lazy(() => import("./pages/Sales/Sales"));
 const AddSale = lazy(() => import("./pages/Sales/AddSale"));
 const EditSale = lazy(() => import("./pages/Sales/EditSale"));
 const ViewSale = lazy(() => import("./pages/Sales/ViewSale"));
+const Users = lazy(() => import("./pages/UserManagement/Users"));
+const Roles = lazy(() => import("./pages/RoleManagement/Roles"));
+const AddRole = lazy(() => import("./pages/RoleManagement/AddRole"));
+const EditRole = lazy(() => import("./pages/RoleManagement/EditRole"));
 
 
 const AppRoutes = () => {
@@ -85,6 +89,10 @@ const AppRoutes = () => {
             { path: "videos", element: <Videos /> },
             { path: "line-chart", element: <LineChart /> },
             { path: "bar-chart", element: <BarChart /> },
+            { path: "users", element: <Users /> },
+            { path: "roles", element: <Roles /> },
+            { path: "roles/add", element: <AddRole /> },
+            { path: "roles/edit/:id", element: <EditRole /> },
           ],
         },
       ],

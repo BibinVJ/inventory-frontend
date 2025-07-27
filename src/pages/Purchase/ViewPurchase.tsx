@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import api from '../../services/api';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -9,6 +8,7 @@ import Button from '../../components/ui/button/Button';
 import Badge from '../../components/ui/badge/Badge';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import VoidPurchaseModal from '../../components/purchase/VoidPurchaseModal';
+import { getPurchase } from '../../services/PurchaseService';
 
 interface Purchase {
   id: number;
@@ -39,21 +39,23 @@ interface Purchase {
 }
 
 export default function ViewPurchase() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchPurchase = async () => {
+    const fetchPurchaseDetails = async () => {
       try {
-        const response = await api.get(`/purchase/${id}`);
-        setPurchase(response.data.results);
+        if (id) {
+          const response = await getPurchase(id);
+          setPurchase(response);
+        }
       } catch (error) {
         console.error('Error fetching purchase details:', error);
       }
     };
-    fetchPurchase();
+    fetchPurchaseDetails();
   }, [id]);
 
   const handlePrint = () => {

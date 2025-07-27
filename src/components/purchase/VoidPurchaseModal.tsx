@@ -1,8 +1,8 @@
 
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { voidPurchase } from '../../services/PurchaseService';
 
 interface Purchase {
   id: number;
@@ -20,7 +20,7 @@ export default function VoidPurchaseModal({ isOpen, onClose, onPurchaseVoided, p
 
   const handleVoid = async () => {
     try {
-      await api.delete(`/purchase/${purchase.id}`);
+      await voidPurchase(purchase.id);
       onPurchaseVoided();
       toast.success('Purchase voided successfully');
       onClose();

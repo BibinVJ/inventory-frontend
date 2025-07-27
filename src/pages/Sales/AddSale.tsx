@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -13,23 +12,9 @@ import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
-
-interface Customer {
-  id: number;
-  name: string;
-}
-
-interface Item {
-  id: number;
-  name: string;
-  description: string;
-  stock_on_hand: number;
-  non_expired_stock: number;
-  is_expired_sale_enabled: boolean;
-  unit: {
-    code: string;
-  };
-}
+import { getCustomers, Customer } from '../../services/CustomerService';
+import { getItems, getItem, Item } from '../../services/ItemService';
+import { getNextInvoiceNumber, addSale } from '../../services/SaleService';
 
 interface SaleItem {
   item_id: string;
@@ -56,37 +41,25 @@ export default function AddSale() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCustomers();
-    fetchItems();
-    fetchNextInvoiceNumber();
+    fetchInitialData();
   }, []);
 
-  const fetchNextInvoiceNumber = async () => {
+  const fetchInitialData = async () => {
     try {
-      const response = await api.get('/sale/next-invoice-number');
-      if (response.data.results) {
-        setInvoiceNumber(response.data.results.invoice_number);
+      const [customerResponse, itemResponse, invoiceResponse] = await Promise.all([
+        getCustomers(1, 10, 'created_at', 'desc', true),
+        getItems(1, 10, 'created_at', 'desc', true),
+        getNextInvoiceNumber()
+      ]);
+      // @ts-ignore
+      setCustomers(customerResponse);
+      // @ts-ignore
+      setItems(itemResponse);
+      if (invoiceResponse) {
+        setInvoiceNumber(invoiceResponse.invoice_number);
       }
     } catch (error) {
-      console.error('Error fetching next invoice number:', error);
-    }
-  };
-
-  const fetchCustomers = async () => {
-    try {
-      const response = await api.get('/customer?unpaginated=1');
-      setCustomers(response.data.results);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
-  };
-
-  const fetchItems = async () => {
-    try {
-      const response = await api.get('/item?unpaginated=1');
-      setItems(response.data.results);
-    } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Error fetching initial data:', error);
     }
   };
 
@@ -98,22 +71,17 @@ export default function AddSale() {
     const newItems = [...saleItems];
     newItems[index] = { ...newItems[index], [field]: value };
 
-    if (field === 'item_id') {
-      if (value) {
-        try {
-          const response = await api.get(`/item/${value}`);
-          const itemDetails: Item = response.data.results;
-          // newItems[index].description = itemDetails.description;
-          newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-            ? itemDetails.stock_on_hand
-            : itemDetails.non_expired_stock;
-        } catch (error) {
-          console.error('Error fetching item details:', error);
-          newItems[index].description = '';
-          newItems[index].available_stock = 0;
-        }
-      } else {
-        newItems[index].description = '';
+    if (field === 'item_id' && value) {
+      try {
+        const itemDetails = await getItem(value);
+        // @ts-ignore
+        newItems[index].available_stock = itemDetails.is_expired_sale_enabled
+        // @ts-ignore
+          ? itemDetails.stock_on_hand
+        // @ts-ignore
+          : itemDetails.non_expired_stock;
+      } catch (error) {
+        console.error('Error fetching item details:', error);
         newItems[index].available_stock = 0;
       }
     }
@@ -130,32 +98,16 @@ export default function AddSale() {
   const validateForm = () => {
     const newErrors: ApiError = {};
 
-    if (!customerId) {
-      newErrors.customer_id = ['Customer is required.'];
-    }
-    if (!invoiceNumber.trim()) {
-      newErrors.invoice_number = ['Invoice number is required.'];
-    }
-    if (!saleDate) {
-      newErrors.sale_date = ['Sale date is required.'];
-    }
-    if (saleItems.length === 0) {
-      newErrors.items = ['At least one item is required.'];
-    }
+    if (!customerId) newErrors.customer_id = ['Customer is required.'];
+    if (!invoiceNumber.trim()) newErrors.invoice_number = ['Invoice number is required.'];
+    if (!saleDate) newErrors.sale_date = ['Sale date is required.'];
+    if (saleItems.length === 0) newErrors.items = ['At least one item is required.'];
 
     saleItems.forEach((item, index) => {
-      if (!item.item_id) {
-        newErrors[`items.${index}.item_id`] = ['Item is required.'];
-      }
-      if (item.quantity <= 0) {
-        newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      }
-      if (item.quantity > item.available_stock) {
-        newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
-      }
-      if (item.unit_price < 0) {
-        newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
-      }
+      if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
+      if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
+      if (item.quantity > item.available_stock) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
+      if (item.unit_price < 0) newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
     });
 
     setErrors(newErrors);
@@ -170,7 +122,7 @@ export default function AddSale() {
     }
 
     try {
-      await api.post('/sale', {
+      await addSale({
         customer_id: customerId,
         invoice_number: invoiceNumber,
         sale_date: saleDate,
@@ -199,9 +151,7 @@ export default function AddSale() {
     }
   };
 
-  const getErrorMessage = (field: string) => {
-    return errors[field] ? errors[field][0] : '';
-  }
+  const getErrorMessage = (field: string) => errors[field]?.[0] || '';
 
   return (
     <>

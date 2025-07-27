@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
@@ -8,6 +7,7 @@ import Switch from '../form/switch/Switch';
 import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { updateVendor } from '../../services/VendorService';
 
 interface Vendor {
   id: number;
@@ -65,7 +65,7 @@ export default function EditVendorModal({ isOpen, onClose, onVendorUpdated, vend
     }
 
     try {
-      await api.put(`/vendor/${vendor.id}`, { name, email, phone, address, is_active: isActive });
+      await updateVendor(vendor.id, { name, email, phone, address, is_active: isActive });
       onVendorUpdated();
       toast.success('Vendor updated successfully');
       onClose();

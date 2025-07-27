@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import api from '../../../services/api';
 import { Modal } from '../../ui/modal';
 import Input from '../../form/input/InputField';
 import Label from '../../form/Label';
@@ -8,6 +7,7 @@ import Switch from '../../form/switch/Switch';
 import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
+import { addCategory } from '../../../services/CategoryService';
 
 interface Props {
   isOpen: boolean;
@@ -41,7 +41,7 @@ export default function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: P
     }
     
     try {
-      await api.post(`/category`, { name, description, is_active: isActive });
+      await addCategory({ name, description, is_active: isActive });
       onCategoryAdded();
       toast.success('Category added successfully');
       handleClose();

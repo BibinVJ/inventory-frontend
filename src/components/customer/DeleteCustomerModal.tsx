@@ -1,8 +1,8 @@
 
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { deleteCustomer } from '../../services/CustomerService';
 
 interface Customer {
   id: number;
@@ -20,7 +20,7 @@ export default function DeleteCustomerModal({ isOpen, onClose, onCustomerDeleted
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/customer/${customer.id}`);
+      await deleteCustomer(customer.id);
       onCustomerDeleted();
       toast.success('Customer deleted successfully');
       onClose();

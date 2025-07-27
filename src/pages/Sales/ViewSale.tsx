@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import api from '../../services/api';
+import { useParams } from 'react-router';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import Badge from '../../components/ui/badge/Badge';
+import { getSale } from '../../services/SaleService';
 
 interface Sale {
   id: number;
@@ -31,17 +31,19 @@ interface Sale {
 }
 
 export default function ViewSale() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [sale, setSale] = useState<Sale | null>(null);
 
   useEffect(() => {
-    fetchSale();
+    if (id) {
+      fetchSale(id);
+    }
   }, [id]);
 
-  const fetchSale = async () => {
+  const fetchSale = async (saleId: string) => {
     try {
-      const response = await api.get(`/sale/${id}`);
-      setSale(response.data.results);
+      const response = await getSale(saleId);
+      setSale(response);
     } catch (error) {
       console.error('Error fetching sale:', error);
     }
@@ -87,28 +89,28 @@ export default function ViewSale() {
           <div className="mt-6">
             <h3 className="text-lg font-semibold">Items</h3>
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-                <div className="max-w-full overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableCell isHeader>Item</TableCell>
-                            <TableCell isHeader>Quantity</TableCell>
-                            <TableCell isHeader>Unit Price</TableCell>
-                            <TableCell isHeader>Total Price</TableCell>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {sale.items.map((item, index) => (
-                            <TableRow key={index}>
-                            <TableCell>{item.item.name}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.unit_price}</TableCell>
-                            <TableCell>{item.total_price}</TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
-                </div>
+              <div className="max-w-full overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableCell isHeader>Item</TableCell>
+                      <TableCell isHeader>Quantity</TableCell>
+                      <TableCell isHeader>Unit Price</TableCell>
+                      <TableCell isHeader>Total Price</TableCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sale.items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.item.name}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.unit_price}</TableCell>
+                        <TableCell>{item.total_price}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
 

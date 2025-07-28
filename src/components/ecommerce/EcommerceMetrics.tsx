@@ -57,12 +57,12 @@ export default function EcommerceMetrics({ data }: { data: any }) {
       <MetricCard
         icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Customers"
-        value={data?.total_customers_count ?? 0}
+        value={data?.total_customers ?? 0}
       />
       <MetricCard
         icon={<PageIcon className="text-gray-800 size-6 dark:text-white/90" />}
         title="Total Items"
-        value={data?.total_items_count ?? 0}
+        value={data?.total_items ?? 0}
       />
     </div>
   );

@@ -60,7 +60,7 @@ export default function EditRole() {
   const { groupedPermissions, allActions } = useMemo(() => {
     const actionsOrder = ['view', 'create', 'update', 'delete', 'manage'];
     const newAllActions: string[] = [];
-    
+
     const newGroupedPermissions = availablePermissions.reduce((acc, permission) => {
       const parts = permission.name.split('-');
       const action = parts[0];
@@ -145,13 +145,15 @@ export default function EditRole() {
       <ComponentCard>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6">
-            <div>
-              <Label>Name <span className="text-red-500">*</span></Label>
-              <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
-            </div>
-            <div>
-              <Label>Status</Label>
-              <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <Label>Name <span className="text-red-500">*</span></Label>
+                <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
+              </div>
             </div>
             <div>
               <Label>Permissions <span className="text-red-500">*</span></Label>

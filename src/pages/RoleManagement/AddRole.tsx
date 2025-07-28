@@ -124,7 +124,6 @@ export default function AddRole() {
   };
 
   const allSelected = availablePermissions.length > 0 && selectedPermissions.length === availablePermissions.length;
-  const isIndeterminate = selectedPermissions.length > 0 && !allSelected;
 
   return (
     <>
@@ -133,14 +132,17 @@ export default function AddRole() {
       <ComponentCard>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6">
-            <div>
-              <Label>Name <span className="text-red-500">*</span></Label>
-              <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <Label>Name <span className="text-red-500">*</span></Label>
+                <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
+              </div>
             </div>
-            <div>
-              <Label>Status</Label>
-              <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
-            </div>
+
             <div>
               <Label>Permissions <span className="text-red-500">*</span></Label>
               <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">

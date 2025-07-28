@@ -91,7 +91,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
     }
   };
 
-  const roleOptions = roles.map(r => ({ value: r.id, label: formatKebabCase(r.name) }));
+  const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] lg:p-11">
@@ -121,7 +121,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
               </div>
               <div>
                 <Label>Role</Label>
-                <Select options={roleOptions} value={String(roleId)} onChange={(value) => { setRoleId(Number(value)); setErrors({ ...errors, role_id: '' }) }} error={!!errors.role_id} hint={errors.role_id} />
+                <Select options={roleOptions} defaultValue={String(roleId)} onChange={(value) => { setRoleId(Number(value)); setErrors({ ...errors, role_id: '' }) }} error={!!errors.role_id} hint={errors.role_id} />
               </div>
               <div>
                 <Label>Status</Label>

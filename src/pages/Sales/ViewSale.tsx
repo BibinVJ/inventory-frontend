@@ -8,27 +8,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../compon
 import Badge from '../../components/ui/badge/Badge';
 import { getSale } from '../../services/SaleService';
 
-interface Sale {
-  id: number;
-  invoice_number: string;
-  sale_date: string;
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  items: {
-    item: {
-      name: string;
-    };
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-  }[];
-  total_amount: number;
-  payment_status: string;
-}
+import { Sale } from '../../types';
 
 export default function ViewSale() {
   const { id } = useParams<{ id: string }>();

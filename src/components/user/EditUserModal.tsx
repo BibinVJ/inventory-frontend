@@ -7,10 +7,11 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { updateUser } from '../../services/UserService';
 import { getRoles } from '../../services/RoleService';
-import { User, Role } from '../../types';
 import Select from '../form/Select';
 import Switch from '../form/switch/Switch';
 import { formatKebabCase } from '../../utils/string';
+import { User } from '../../types/User';
+import { Role } from '../../types/Role';
 
 interface Props {
   isOpen: boolean;

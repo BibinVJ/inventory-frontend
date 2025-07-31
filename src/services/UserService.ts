@@ -1,5 +1,6 @@
+import { UserApiResponse } from '../types/Permission';
+import { User } from '../types/User';
 import api from './api';
-import { User, UserApiResponse } from '../types';
 
 export const getUsers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc'): Promise<UserApiResponse> => {
   const response = await api.get(`/user?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);

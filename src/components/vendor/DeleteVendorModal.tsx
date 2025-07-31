@@ -4,10 +4,7 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteVendor } from '../../services/VendorService';
 
-interface Vendor {
-  id: number;
-  name: string;
-}
+import { Vendor } from '../../types';
 
 interface Props {
   isOpen: boolean;

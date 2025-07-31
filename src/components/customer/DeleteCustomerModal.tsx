@@ -4,10 +4,7 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteCustomer } from '../../services/CustomerService';
 
-interface Customer {
-  id: number;
-  name: string;
-}
+import { Customer } from '../../types';
 
 interface Props {
   isOpen: boolean;

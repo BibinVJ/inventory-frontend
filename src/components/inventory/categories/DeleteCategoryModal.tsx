@@ -3,12 +3,7 @@ import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteCategory } from '../../../services/CategoryService';
 
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
+import { Category } from '@/types';
 
 interface Props {
   isOpen: boolean;

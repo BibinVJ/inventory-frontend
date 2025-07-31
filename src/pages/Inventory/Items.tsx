@@ -10,7 +10,10 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { getItems, Item } from '../../services/ItemService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Items() {
+  const { hasPermission } = usePermissions();
   const [items, setItems] = useState<Item[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,9 +84,11 @@ export default function Items() {
             searchable={false}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Item
-        </Button>
+        {hasPermission("create-item") && (
+          <Button onClick={openModal}>
+            Add Item
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard title="Items">

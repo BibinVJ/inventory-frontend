@@ -1,23 +1,7 @@
 
 import api from './api';
 
-export interface Vendor {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  is_active: boolean;
-}
-
-export interface VendorApiResponse {
-  data: Vendor[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
-}
+import { VendorApiResponse } from '../types';
 
 export const getVendors = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<VendorApiResponse> => {
   const url = unpaginated ? '/vendor?unpaginated=1' : `/vendor?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;

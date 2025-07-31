@@ -11,7 +11,10 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { getUnits, Unit } from '../../services/UnitService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Units() {
+  const { hasPermission } = usePermissions();
   const [units, setUnits] = useState<Unit[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,9 +85,11 @@ export default function Units() {
             searchable={false}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Unit
-        </Button>
+        {hasPermission("create-unit") && (
+          <Button onClick={openModal}>
+            Add Unit
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard title="Units">

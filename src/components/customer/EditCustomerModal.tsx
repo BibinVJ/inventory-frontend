@@ -9,14 +9,7 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { updateCustomer } from '../../services/CustomerService';
 
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  is_active: boolean;
-}
+import { Customer } from '../../types';
 
 interface Props {
   isOpen: boolean;

@@ -10,33 +10,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../compon
 import VoidPurchaseModal from '../../components/purchase/VoidPurchaseModal';
 import { getPurchase } from '../../services/PurchaseService';
 
-interface Purchase {
-  id: number;
-  invoice_number: string;
-  purchase_date: string;
-  vendor: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  items: {
-    item: {
-      sku: string;
-      name: string;
-    };  
-    batch: {
-      batch_number: string,
-      manufacture_date: string,
-      expiry_date: string,
-    };
-    quantity: number;
-    unit_cost: number;
-    total_cost: number;
-  }[];
-  total_amount: number;
-  payment_status: string;
-}
+import { Purchase } from '../../types';
 
 export default function ViewPurchase() {
   const { id } = useParams<{ id: string }>();

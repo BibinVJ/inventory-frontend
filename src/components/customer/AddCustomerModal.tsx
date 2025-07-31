@@ -12,7 +12,7 @@ import { addCustomer } from '../../services/CustomerService';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCustomerAdded: () => void;
+  onCustomerAdded: (customer: any) => void;
 }
 
 export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: Props) {
@@ -59,8 +59,8 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
     }
 
     try {
-      await addCustomer({ name, email, phone, address, is_active: isActive });
-      onCustomerAdded();
+      const response = await addCustomer({ name, email, phone, address, is_active: isActive });
+      onCustomerAdded(response.results);
       toast.success('Customer added successfully');
       handleClose();
     } catch (error: any) {

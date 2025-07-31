@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { createRole } from '../../services/RoleService';
 import { getPermissions } from '../../services/PermissionService';
-import { Permission } from '../../types';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -16,6 +15,7 @@ import Checkbox from '../../components/form/input/Checkbox';
 import Button from '../../components/ui/button/Button';
 
 import { formatKebabCase } from '../../utils/string';
+import { Permission } from '../../types/Permission';
 
 export default function AddRole() {
   const [name, setName] = useState('');

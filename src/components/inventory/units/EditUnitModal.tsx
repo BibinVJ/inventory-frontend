@@ -8,13 +8,7 @@ import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { updateUnit } from '../../../services/UnitService';
 
-interface Unit {
-  id: number;
-  name: string;
-  code: string;
-  description: string;
-  is_active: boolean;
-}
+import { Unit } from '../../../types';
 
 interface Props {
   isOpen: boolean;

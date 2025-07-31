@@ -4,12 +4,7 @@ import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteItem } from '../../../services/ItemService';
 
-interface Item {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
+import { Item } from '../../../types';
 
 interface Props {
   isOpen: boolean;

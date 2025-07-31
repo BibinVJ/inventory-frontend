@@ -1,32 +1,7 @@
 
 import api from './api';
 
-export interface Item {
-  id: number;
-  sku: string;
-  name:string;
-  description: string;
-  is_active: boolean;
-  category: {
-    id: number;
-    name: string;
-  };
-  unit: {
-    id: number;
-    name: string;
-    code: string;
-  };
-  type: string;
-}
-
-export interface ItemApiResponse {
-  data: Item[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
-}
+import { Item, ItemApiResponse } from '../types';
 
 export const getItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<ItemApiResponse> => {
   const url = unpaginated ? '/item?unpaginated=1' : `/item?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;

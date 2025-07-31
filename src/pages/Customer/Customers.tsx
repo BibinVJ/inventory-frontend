@@ -11,7 +11,10 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { getCustomers, Customer } from '../../services/CustomerService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Customers() {
+  const { hasPermission } = usePermissions();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,9 +85,11 @@ export default function Customers() {
             searchable={false}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Customer
-        </Button>
+        {hasPermission("create-customer") && (
+          <Button onClick={openModal}>
+            Add Customer
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard title="Customers">

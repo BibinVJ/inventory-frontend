@@ -11,7 +11,10 @@ import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { getVendors, Vendor } from '../../services/VendorService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Vendors() {
+  const { hasPermission } = usePermissions();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,9 +85,11 @@ export default function Vendors() {
             searchable={false}
           />
         </div>
-        <Button onClick={openModal}>
-          Add Vendor
-        </Button>
+        {hasPermission("create-vendor") && (
+          <Button onClick={openModal}>
+            Add Vendor
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard title="Vendors">

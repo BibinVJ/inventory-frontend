@@ -12,9 +12,14 @@ import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
-import { getCustomers, Customer } from '../../services/CustomerService';
-import { getItems, getItem, Item } from '../../services/ItemService';
+import { getCustomers } from '../../services/CustomerService';
+import { getItems, getItem } from '../../services/ItemService';
 import { getNextInvoiceNumber, addSale } from '../../services/SaleService';
+
+import AddCustomerModal from '../../components/customer/AddCustomerModal';
+import { useModal } from '../../hooks/useModal';
+import { Customer, Item } from '../../types';
+import { Plus } from 'lucide-react';
 
 interface SaleItem {
   item_id: string;
@@ -29,6 +34,7 @@ interface ApiError {
 }
 
 export default function AddSale() {
+  const { isOpen: isCustomerModalOpen, openModal: openCustomerModal, closeModal: closeCustomerModal } = useModal();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -153,6 +159,12 @@ export default function AddSale() {
 
   const getErrorMessage = (field: string) => errors[field]?.[0] || '';
 
+  const handleCustomerAdded = (newCustomer: Customer) => {
+    setCustomers(prev => [...prev, newCustomer]);
+    setCustomerId(String(newCustomer.id));
+    closeCustomerModal();
+  };
+
   return (
     <>
       <PageMeta
@@ -160,20 +172,25 @@ export default function AddSale() {
         description="Add a new sale"
       />
       <PageBreadcrumb pageTitle="Add Sale" breadcrumbs={[{ label: 'Sales', path: '/sales' }]} backButton={true}/>
-
       <ComponentCard>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <Label>Customer</Label>
-              <Select
-                options={customers.map(c => ({ value: String(c.id), label: c.name }))}
-                onChange={(value) => { setCustomerId(value); clearError('customer_id'); }}
-                defaultValue={customerId}
-                placeholder="Select a customer"
-                error={!!getErrorMessage('customer_id')}
-                hint={getErrorMessage('customer_id')}
-              />
+              <div className="flex items-center gap-2">
+                <Select
+                  options={customers.map(c => ({ value: String(c.id), label: c.name }))}
+                  onChange={(value) => { setCustomerId(value); clearError('customer_id'); }}
+                  defaultValue={customerId}
+                  placeholder="Select a customer"
+                  error={!!getErrorMessage('customer_id')}
+                  hint={getErrorMessage('customer_id')}
+                  className="flex-grow"
+                />
+                <Button type="button" onClick={openCustomerModal} className="p-1" size='xs'>
+                  <Plus></Plus>
+                </Button>
+              </div>
             </div>
             <div>
               <Label>Invoice Number</Label>
@@ -300,6 +317,7 @@ export default function AddSale() {
           </div>
         </form>
       </ComponentCard>
+      <AddCustomerModal isOpen={isCustomerModalOpen} onClose={closeCustomerModal} onCustomerAdded={handleCustomerAdded} />
     </>
   );
 }

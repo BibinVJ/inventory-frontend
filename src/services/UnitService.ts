@@ -1,21 +1,7 @@
 
 import api from './api';
 
-export interface Unit {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
-
-export interface UnitApiResponse {
-  data: Unit[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
-}
+import { UnitApiResponse } from '../types';
 
 export const getUnits = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<UnitApiResponse> => {
   const url = unpaginated ? '/unit?unpaginated=1' : `/unit?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;

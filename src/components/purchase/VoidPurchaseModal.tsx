@@ -4,10 +4,7 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { voidPurchase } from '../../services/PurchaseService';
 
-interface Purchase {
-  id: number;
-  invoice_number: string;
-}
+import { Purchase } from '../../types';
 
 interface Props {
   isOpen: boolean;

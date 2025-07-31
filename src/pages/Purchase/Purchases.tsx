@@ -10,7 +10,10 @@ import Select from '../../components/form/Select';
 import { useNavigate } from 'react-router';
 import { getPurchases, Purchase } from '../../services/PurchaseService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Purchases() {
+  const { hasPermission } = usePermissions();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -81,9 +84,11 @@ export default function Purchases() {
             searchable={false}
           />
         </div>
-        <Button onClick={() => navigate('/purchases/add')}>
-          Add Purchase
-        </Button>
+        {hasPermission("create-purchase") && (
+          <Button onClick={() => navigate('/purchases/add')}>
+            Add Purchase
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard>

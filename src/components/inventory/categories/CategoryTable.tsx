@@ -15,12 +15,7 @@ import Button from "../../ui/button/Button";
 import { PencilIcon, TrashBinIcon } from "../../../icons";
 import Tooltip from "../../ui/tooltip/Tooltip";
 
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
+import { Category } from "@/types";
 
 interface Props {
   data: Category[];

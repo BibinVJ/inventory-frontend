@@ -11,22 +11,7 @@ import { updateItem } from '../../../services/ItemService';
 import { getCategories, Category } from '../../../services/CategoryService';
 import { getUnits, Unit } from '../../../services/UnitService';
 
-interface Item {
-  id: number;
-  sku: string;
-  name: string;
-  description: string;
-  is_active: boolean;
-  category: {
-    id: number;
-    name: string;
-  };
-  unit: {
-    id: number;
-    name: string;
-  };
-  type: string;
-}
+import { Item } from '../../../types';
 
 interface Props {
   isOpen: boolean;

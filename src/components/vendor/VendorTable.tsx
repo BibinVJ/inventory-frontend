@@ -15,14 +15,7 @@ import Button from "../ui/button/Button";
 import { PencilIcon, TrashBinIcon } from "../../icons";
 import Tooltip from "../ui/tooltip/Tooltip";
 
-interface Vendor {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  is_active: boolean;
-}
+import { Vendor } from '../../types';
 
 interface Props {
   data: Vendor[];
@@ -34,7 +27,10 @@ interface Props {
   perPage: number;
 }
 
+import { usePermissions } from "../../hooks/usePermissions";
+
 export default function VendorTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+  const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(
@@ -103,24 +99,28 @@ export default function VendorTable({ data, onAction, onSort, sortBy, sortDirect
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    <Tooltip text="Edit">
-                      <Button
-                        size="xs"
-                        onClick={() => handleEdit(vendor)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <PencilIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip text="Delete">
-                      <Button
-                        size="xs"
-                        onClick={() => handleDelete(vendor)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <TrashBinIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
+                    {hasPermission("update-vendor") && (
+                      <Tooltip text="Edit">
+                        <Button
+                          size="xs"
+                          onClick={() => handleEdit(vendor)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                    )}
+                    {hasPermission("delete-vendor") && (
+                      <Tooltip text="Delete">
+                        <Button
+                          size="xs"
+                          onClick={() => handleDelete(vendor)}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          <TrashBinIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

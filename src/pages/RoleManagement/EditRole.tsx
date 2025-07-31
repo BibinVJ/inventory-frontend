@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { getRole, updateRole } from '../../services/RoleService';
 import { getPermissions } from '../../services/PermissionService';
-import { Permission, Role } from '../../types';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
@@ -16,6 +15,8 @@ import Checkbox from '../../components/form/input/Checkbox';
 import Button from '../../components/ui/button/Button';
 
 import { formatKebabCase } from '../../utils/string';
+import { Permission } from '../../types/Permission';
+import { Role } from '../../types/Role';
 
 export default function EditRole() {
   const { id } = useParams<{ id: string }>();

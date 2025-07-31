@@ -88,26 +88,28 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <Tooltip text="Edit">
-                      <Button
-                        size="xs"
-                        onClick={() => handleEdit(role)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <PencilIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip text="Delete">
-                      <Button
-                        size="xs"
-                        onClick={() => handleDelete(role)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <TrashBinIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                  </div>
+                  {role.name !== "admin" && (
+                    <div className="flex items-center gap-2">
+                      <Tooltip text="Edit">
+                        <Button
+                          size="xs"
+                          onClick={() => handleEdit(role)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip text="Delete">
+                        <Button
+                          size="xs"
+                          onClick={() => handleDelete(role)}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          <TrashBinIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -116,10 +118,10 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
       </div>
       {selectedRole && (
         <DeleteRoleModal
-            isOpen={isDeleteModalOpen}
-            onClose={handleCloseModals}
-            onRoleDeleted={onAction}
-            role={selectedRole}
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseModals}
+          onRoleDeleted={onAction}
+          role={selectedRole}
         />
       )}
     </div>

@@ -7,31 +7,7 @@ import {
 } from "../services/AuthService";
 import api from "../services/api";
 
-type User = {
-  id: number;
-  name: string;
-  // first_name: string;
-  // last_name: string;
-  email: string;
-  phone: string;
-  profile_image: string;
-  address: string;
-  city: string;
-  state: string;
-  zip_code: string;
-};
-
-interface AuthContextType {
-  user: User | null;
-  login: (
-    email: string,
-    password: string,
-    stayLoggedIn: boolean
-  ) => Promise<any>;
-  logout: () => void;
-  loading: boolean;
-  fetchProfile: () => Promise<void>;
-}
+import { AuthContextType, User } from '../types';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -75,8 +51,13 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const hasPermission = (permission: string) => {
+    if (!user) return false;
+    return user.permission_names.includes(permission);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, fetchProfile }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, fetchProfile, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );

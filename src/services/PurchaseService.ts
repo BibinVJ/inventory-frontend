@@ -1,25 +1,7 @@
 
 import api from './api';
 
-export interface Purchase {
-  id: number;
-  invoice_number: string;
-  purchase_date: string;
-  vendor: {
-    name: string;
-  };
-  total_amount: number;
-  payment_status: string;
-}
-
-export interface PurchaseApiResponse {
-  data: Purchase[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
-}
+import { PurchaseApiResponse } from '../types';
 
 export const getPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc'): Promise<PurchaseApiResponse> => {
   const response = await api.get(`/purchase?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);

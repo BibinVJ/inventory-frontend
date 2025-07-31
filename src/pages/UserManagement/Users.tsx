@@ -9,8 +9,8 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { User } from '../../types';
 import { getUsers } from '../../services/UserService';
+import { User } from '../../types/User';
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);

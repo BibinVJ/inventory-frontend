@@ -1,5 +1,5 @@
+import { Role, RoleApiResponse } from '../types/Role';
 import api from './api';
-import { Role, RoleApiResponse } from '../types';
 
 export const getRoles = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<RoleApiResponse> => {
   const url = unpaginated ? '/role?unpaginated=1' : `/role?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;

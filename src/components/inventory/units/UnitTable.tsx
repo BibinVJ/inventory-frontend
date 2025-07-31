@@ -15,13 +15,7 @@ import Button from "../../ui/button/Button";
 import { PencilIcon, TrashBinIcon } from "../../../icons";
 import Tooltip from "../../ui/tooltip/Tooltip";
 
-interface Unit {
-  id: number;
-  name: string;
-  code: string;
-  description: string;
-  is_active: boolean;
-}
+import { Unit } from '../../../types';
 
 interface Props {
   data: Unit[];
@@ -33,7 +27,10 @@ interface Props {
   perPage: number;
 }
 
+import { usePermissions } from "../../../hooks/usePermissions";
+
 export default function UnitTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
+  const { hasPermission } = usePermissions();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(
@@ -145,24 +142,28 @@ export default function UnitTable({ data, onAction, onSort, sortBy, sortDirectio
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    <Tooltip text="Edit">
-                      <Button
-                        size="xs"
-                        onClick={() => handleEdit(unit)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <PencilIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip text="Delete">
-                      <Button
-                        size="xs"
-                        onClick={() => handleDelete(unit)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <TrashBinIcon className="w-4 h-4" />
-                      </Button>
-                    </Tooltip>
+                    {hasPermission("update-unit") && (
+                      <Tooltip text="Edit">
+                        <Button
+                          size="xs"
+                          onClick={() => handleEdit(unit)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                    )}
+                    {hasPermission("delete-unit") && (
+                      <Tooltip text="Delete">
+                        <Button
+                          size="xs"
+                          onClick={() => handleDelete(unit)}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          <TrashBinIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

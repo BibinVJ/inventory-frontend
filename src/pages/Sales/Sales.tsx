@@ -9,7 +9,10 @@ import Select from '../../components/form/Select';
 import { useNavigate } from 'react-router';
 import { getSales, Sale } from '../../services/SaleService';
 
+import { usePermissions } from '../../hooks/usePermissions';
+
 export default function Sales() {
+  const { hasPermission } = usePermissions();
   const [sales, setSales] = useState<Sale[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -80,9 +83,11 @@ export default function Sales() {
             searchable={false}
           />
         </div>
-        <Button onClick={() => navigate('/sales/add')}>
-          Add Sale
-        </Button>
+        {hasPermission("create-sale") && (
+          <Button onClick={() => navigate('/sales/add')}>
+            Add Sale
+          </Button>
+        )}
       </div>
       <div className="space-y-6">
         <ComponentCard>

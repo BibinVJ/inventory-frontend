@@ -7,14 +7,7 @@ import {
   TableRow,
 } from "../ui/table";
 
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  total_spent: number;
-  profile_image?: string;
-}
+import { Customer } from '../../types';
 
 interface Props {
   customers: Customer[];

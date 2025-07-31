@@ -9,7 +9,7 @@ import Select from '../../form/Select';
 import { toast } from 'sonner';
 import { addItem } from '../../../services/ItemService';
 import { getCategories, Category } from '../../../services/CategoryService';
-import { getUnits, Unit } from '../../../services/UnitService';
+import { getUnits } from '../../../services/UnitService';
 
 interface Props {
   isOpen: boolean;

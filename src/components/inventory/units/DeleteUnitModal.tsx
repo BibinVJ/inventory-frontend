@@ -4,12 +4,7 @@ import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { deleteUnit } from '../../../services/UnitService';
 
-interface Unit {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
+import { Unit } from '../../../types';
 
 interface Props {
   isOpen: boolean;

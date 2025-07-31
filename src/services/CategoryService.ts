@@ -1,21 +1,6 @@
 
+import { CategoryApiResponse } from '../types';
 import api from './api';
-
-export interface Category {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-}
-
-export interface CategoryApiResponse {
-  data: Category[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
-}
 
 export const getCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc', unpaginated = false): Promise<CategoryApiResponse> => {
   const url = unpaginated ? '/category?unpaginated=1' : `/category?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`;

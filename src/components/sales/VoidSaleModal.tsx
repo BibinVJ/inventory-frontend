@@ -4,10 +4,7 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 
-interface Sale {
-  id: number;
-  invoice_number: string;
-}
+import { Sale } from '../../types';
 
 interface Props {
   isOpen: boolean;

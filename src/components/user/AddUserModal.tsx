@@ -7,9 +7,9 @@ import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { createUser } from '../../services/UserService';
 import { getRoles } from '../../services/RoleService';
-import { Role } from '../../types';
 import Select from '../form/Select';
 import { formatKebabCase } from '../../utils/string';
+import { Role } from '../../types/Role';
 
 interface Props {
   isOpen: boolean;

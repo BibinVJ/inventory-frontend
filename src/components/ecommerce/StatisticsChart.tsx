@@ -57,7 +57,7 @@ export default function StatisticsChart({ data }: { data: any }) {
       horizontalAlign: "left",
       fontFamily: "Outfit, sans-serif",
       markers: {
-        radius: 12,
+        size: 6,
       }
     },
     colors: ["#465FFF", "#9CB9FF"],

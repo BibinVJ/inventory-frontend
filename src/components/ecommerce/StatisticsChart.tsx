@@ -1,157 +1,123 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import ChartTab from "../common/ChartTab";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Period = "monthly" | "quarterly" | "annually";
 
 export default function StatisticsChart({ data }: { data: any }) {
   const [period, setPeriod] = useState<Period>("monthly");
+  const [chartSeries, setChartSeries] = useState<{ name: string; data: number[] }[]>([]);
+  const [chartOptions, setChartOptions] = useState<ApexOptions>({});
 
-  const filterDataByPeriod = (items: any[], period: Period) => {
-    const now = new Date();
-    return items.filter(item => {
-      const itemDate = new Date(item.date);
-      switch (period) {
-        case "monthly":
-          return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
-        case "quarterly":
-          const currentQuarter = Math.floor(now.getMonth() / 3);
-          const itemQuarter = Math.floor(itemDate.getMonth() / 3);
-          return itemQuarter === currentQuarter && itemDate.getFullYear() === now.getFullYear();
-        case "annually":
-          return itemDate.getFullYear() === now.getFullYear();
-        default:
-          return true;
+  useEffect(() => {
+    const processChartData = () => {
+      const sales = data?.sales || [];
+      const purchases = data?.purchases || [];
+
+      let categories: string[] = [];
+      let salesData: number[] = [];
+      let purchasesData: number[] = [];
+
+      if (period === 'annually') {
+        const allDates = [...new Set([...sales.map((s: any) => s.date), ...purchases.map((p: any) => p.date)])].sort();
+        const salesMap = new Map(sales.map((s: any) => [s.date, s.total]));
+        const purchasesMap = new Map(purchases.map((p: any) => [p.date, p.total]));
+        
+        categories = allDates.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        salesData = allDates.map(date => salesMap.get(date) || 0) as number[];
+        purchasesData = allDates.map(date => purchasesMap.get(date) || 0) as number[];
+
+      } else if (period === 'monthly') {
+        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthlySales: number[] = new Array(12).fill(0);
+        const monthlyPurchases: number[] = new Array(12).fill(0);
+
+        sales.forEach((s: any) => {
+          const month = new Date(s.date).getMonth();
+          monthlySales[month] += s.total;
+        });
+        purchases.forEach((p: any) => {
+          const month = new Date(p.date).getMonth();
+          monthlyPurchases[month] += p.total;
+        });
+        salesData = monthlySales;
+        purchasesData = monthlyPurchases;
+
+      } else if (period === 'quarterly') {
+        categories = ["Q1", "Q2", "Q3", "Q4"];
+        const quarterlySales: number[] = new Array(4).fill(0);
+        const quarterlyPurchases: number[] = new Array(4).fill(0);
+
+        const getQuarter = (date: Date) => Math.floor(date.getMonth() / 3);
+
+        sales.forEach((s: any) => {
+          const quarter = getQuarter(new Date(s.date));
+          quarterlySales[quarter] += s.total;
+        });
+        purchases.forEach((p: any) => {
+          const quarter = getQuarter(new Date(p.date));
+          quarterlyPurchases[quarter] += p.total;
+        });
+        salesData = quarterlySales;
+        purchasesData = quarterlyPurchases;
       }
-    });
-  };
 
-  const filteredSales = filterDataByPeriod(data?.sales || [], period);
-  const filteredPurchases = filterDataByPeriod(data?.purchases || [], period);
+      setChartSeries([
+        { name: "Sales", data: salesData },
+        { name: "Purchases", data: purchasesData },
+      ]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
-  };
-
-  const allDates = [
-    ...filteredSales.map((s: any) => s.date),
-    ...filteredPurchases.map((p: any) => p.date),
-  ];
-
-  const uniqueSortedDates = [...new Set(allDates)].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-
-  const categories = uniqueSortedDates.map(date => formatDate(date));
-
-  const salesMap = new Map(filteredSales.map((s: any) => [formatDate(s.date), s.total]));
-  const purchasesMap = new Map(filteredPurchases.map((p: any) => [formatDate(p.date), p.total]));
-
-  const salesData = categories.map(date => salesMap.get(date) || 0);
-  const purchasesData = categories.map(date => purchasesMap.get(date) || 0);
-
-  const options: ApexOptions = {
-    legend: {
-      show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Outfit, sans-serif",
-      markers: {
-        size: 6,
-      }
-    },
-    colors: ["#465FFF", "#9CB9FF"],
-    chart: {
-      fontFamily: "Outfit, sans-serif",
-      height: 310,
-      type: "line",
-      toolbar: {
-        show: false,
-      },
-    },
-    stroke: {
-      curve: "smooth",
-      width: [2, 2],
-    },
-    fill: {
-      type: "gradient",
-      gradient: {
-        opacityFrom: 0.55,
-        opacityTo: 0,
-      },
-    },
-    markers: {
-      size: 0,
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 6,
-      },
-    },
-    grid: {
-      xaxis: {
-        lines: {
-          show: false,
-        },
-      },
-      yaxis: {
-        lines: {
+      setChartOptions({
+        legend: {
           show: true,
+          position: "top",
+          horizontalAlign: "left",
+          fontFamily: "Outfit, sans-serif",
         },
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    tooltip: {
-      enabled: true,
-      x: {
-        format: "dd MMM yyyy",
-      },
-    },
-    xaxis: {
-      type: "category",
-      categories: categories,
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      tooltip: {
-        enabled: false,
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          fontSize: "12px",
-          colors: ["#6B7280"],
+        colors: ["#465FFF", "#9CB9FF"],
+        chart: {
+          fontFamily: "Outfit, sans-serif",
+          height: '100%',
+          type: "area",
+          toolbar: { show: false },
         },
-      },
-      title: {
-        text: "",
-        style: {
-          fontSize: "0px",
+        stroke: { curve: "smooth", width: [2, 2] },
+        fill: {
+          type: "gradient",
+          gradient: { opacityFrom: 0.55, opacityTo: 0 },
         },
-      },
-    },
-  };
+        markers: {
+          size: 0,
+          strokeColors: "#fff",
+          strokeWidth: 2,
+          hover: { size: 6 },
+        },
+        grid: {
+          xaxis: { lines: { show: false } },
+          yaxis: { lines: { show: true } },
+        },
+        dataLabels: { enabled: false },
+        tooltip: { enabled: true, x: { format: "dd MMM yyyy" } },
+        xaxis: {
+          type: "category",
+          categories: categories,
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          tooltip: { enabled: false },
+        },
+        yaxis: {
+          labels: { style: { fontSize: "12px", colors: ["#6B7280"] } },
+        },
+      });
+    };
 
-  const series = [
-    {
-      name: "Sales",
-      data: salesData,
-    },
-    {
-      name: "Purchases",
-      data: purchasesData,
-    },
-  ];
+    processChartData();
+  }, [data, period]);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-      <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
+    <div className="flex flex-col h-full rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between flex-shrink-0">
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             Statistics
@@ -165,10 +131,8 @@ export default function StatisticsChart({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="min-w-[1000px] xl:min-w-full">
-          <Chart options={options} series={series} type="area" height={310} />
-        </div>
+      <div className="flex-grow w-full h-full">
+        <Chart options={chartOptions} series={chartSeries} type="area" width="100%" height="100%" />
       </div>
     </div>
   );

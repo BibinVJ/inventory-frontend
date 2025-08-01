@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
     permission: "view-dashboard",
   },
   {
-    name: "Pos",
+    name: "POS",
     icon: <PageIcon />,
     subItems: [
       { name: "Add Sale", path: "/sales/add", permission: "create-sale" },

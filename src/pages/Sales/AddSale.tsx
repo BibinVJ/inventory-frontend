@@ -15,6 +15,7 @@ import TextArea from '../../components/form/input/TextArea';
 import { getCustomers } from '../../services/CustomerService';
 import { getItems, getItem } from '../../services/ItemService';
 import { getNextInvoiceNumber, addSale } from '../../services/SaleService';
+import useFullScreen from "../../hooks/useFullScreen";
 
 import AddCustomerModal from '../../components/customer/AddCustomerModal';
 import { useModal } from '../../hooks/useModal';
@@ -34,6 +35,7 @@ interface ApiError {
 }
 
 export default function AddSale() {
+  const { toggleFullScreen } = useFullScreen();
   const { isOpen: isCustomerModalOpen, openModal: openCustomerModal, closeModal: closeCustomerModal } = useModal();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -45,6 +47,14 @@ export default function AddSale() {
   ]);
   const [errors, setErrors] = useState<ApiError>({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    toggleFullScreen(); // Enter full-screen on mount
+
+    return () => {
+      toggleFullScreen(); // Exit full-screen on unmount
+    };
+  }, []);
 
   useEffect(() => {
     fetchInitialData();

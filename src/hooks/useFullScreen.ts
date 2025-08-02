@@ -1,17 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 
 const useFullScreen = () => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(!!document.fullscreenElement);
 
-  const toggleFullScreen = useCallback(() => {
-    if (!document.fullscreenElement) {
+  const enterFullScreen = useCallback(() => {
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
         console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
       });
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+    }
+  }, []);
+
+  const exitFullScreen = useCallback(() => {
+    if (document.exitFullscreen && document.fullscreenElement) {
+      document.exitFullscreen();
     }
   }, []);
 
@@ -27,7 +29,7 @@ const useFullScreen = () => {
     };
   }, []);
 
-  return { isFullScreen, toggleFullScreen };
+  return { isFullScreen, enterFullScreen, exitFullScreen };
 };
 
 export default useFullScreen;

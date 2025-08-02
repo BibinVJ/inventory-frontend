@@ -236,7 +236,7 @@ function Home() {
         title="Ecommerce Dashboard | Pharmacy Manager"
         description="This is the ecommerce dashboard page for Pharmacy Manager"
       />
-      <div className="p-4 space-y-6 md:p-6 2xl:p-10">
+      <div>
         <div className="flex justify-end gap-2 mb-4">
           {!editMode ? (
             <button onClick={handleEnterEditMode} className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 dark:text-white">

@@ -131,7 +131,7 @@ const othersItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleFullScreen } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
@@ -312,9 +312,10 @@ const AppSidebar: React.FC = () => {
                     <li key={subItem.name}>
                       <Link
                         to={subItem.path}
+                        state={{ goFullScreen: subItem.name === "Add Sale" }}
                         onClick={() => {
-                          if (subItem.name === "Add Sale") {
-                            toggleFullScreen();
+                          if (subItem.name === "Add Sale" && isExpanded) {
+                            toggleSidebar();
                           }
                         }}
                         className={`menu-dropdown-item ${isActive(subItem.path)

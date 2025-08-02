@@ -1,7 +1,7 @@
 
 import api from './api';
 
-import { SaleApiResponse } from '../types';
+import { SaleApiResponse, SalePayload } from '../types';
 
 export const getSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc'): Promise<SaleApiResponse> => {
   const response = await api.get(`/sale?perPage=${limit}&page=${page}&sort_by=${sortCol}&sort_direction=${sortDir}`);
@@ -18,12 +18,17 @@ export const getNextInvoiceNumber = async () => {
     return response.data.results;
 };
 
-export const addSale = async (sale: any) => {
+export const addSale = async (sale: SalePayload) => {
     const response = await api.post('/sale', sale);
     return response.data;
 };
 
-export const updateSale = async (id: string, sale: any) => {
+export const updateSale = async (id: string, sale: SalePayload) => {
     const response = await api.put(`/sale/${id}`, sale);
+    return response.data;
+};
+
+export const voidSale = async (id: number) => {
+    const response = await api.delete(`/sale/${id}`);
     return response.data;
 };

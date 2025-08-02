@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageMeta from '../../components/common/PageMeta';
@@ -11,9 +11,12 @@ import { useNavigate, useParams } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { toast } from 'sonner';
 import TextArea from '../../components/form/input/TextArea';
-import { getCustomers, Customer } from '../../services/CustomerService';
-import { getItems, getItem, Item } from '../../services/ItemService';
+import { getCustomers } from '../../services/CustomerService';
+import { getItems, getItem } from '../../services/ItemService';
+import { Customer, Item } from '../../types';
 import { getSale, updateSale } from '../../services/SaleService';
+import { SaleItem as SaleItemType } from '../../types';
+import { isApiError } from '../../utils/errors';
 
 interface SaleItem {
   id?: number;
@@ -39,40 +42,34 @@ export default function EditSale() {
   const [errors, setErrors] = useState<ApiError>({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchInitialData();
-  }, [id]);
-
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
       const [customerResponse, itemResponse, saleResponse] = await Promise.all([
         getCustomers(1, 10, 'created_at', 'desc', true),
         getItems(1, 10, 'created_at', 'desc', true),
         getSale(id!)
       ]);
-      // @ts-ignore
-      setCustomers(customerResponse);
-      // @ts-ignore
-      setItems(itemResponse);
+      setCustomers(customerResponse.data || customerResponse);
+      setItems(itemResponse.data || itemResponse);
 
       const { customer, invoice_number, sale_date, items } = saleResponse;
       setCustomerId(String(customer.id));
       setInvoiceNumber(invoice_number);
       setSaleDate(sale_date);
 
-      const saleItemsPromises = items.map(async (item: any) => {
-        const itemDetails = await getItem(item.item.id);
+      const saleItemsPromises = items.map(async (item: SaleItemType) => {
+        const itemDetails = await getItem(String(item.item.id));
         return {
           id: item.id,
           item_id: String(item.item.id),
           quantity: item.quantity,
           unit_price: item.unit_price,
           description: itemDetails.description,
-          // @ts-ignore
+          // @ts-expect-error: response type is not defined
           available_stock: itemDetails.is_expired_sale_enabled
-          // @ts-ignore
+            // @ts-expect-error: response type is not defined
             ? itemDetails.stock_on_hand
-          // @ts-ignore
+            // @ts-expect-error: response type is not defined
             : itemDetails.non_expired_stock,
         };
       });
@@ -83,31 +80,35 @@ export default function EditSale() {
     } catch (error) {
       console.error('Error fetching initial data:', error);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   const handleAddItem = () => {
     setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', available_stock: 0 }]);
   };
 
-  const handleItemChange = async (index: number, field: keyof SaleItem, value: any) => {
+  const handleItemChange = async (index: number, field: keyof SaleItem, value: string | number) => {
     const newItems = [...saleItems];
     newItems[index] = { ...newItems[index], [field]: value };
 
     if (field === 'item_id' && value) {
-        try {
-            const itemDetails = await getItem(value);
-            newItems[index].description = itemDetails.description;
-            // @ts-ignore
-            newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-            // @ts-ignore
-            ? itemDetails.stock_on_hand
-            // @ts-ignore
-            : itemDetails.non_expired_stock;
-        } catch (error) {
-            console.error('Error fetching item details:', error);
-            newItems[index].description = '';
-            newItems[index].available_stock = 0;
-        }
+      try {
+        const itemDetails = await getItem(String(value));
+        newItems[index].description = itemDetails.description;
+        // @ts-expect-error: response type is not defined
+        newItems[index].available_stock = itemDetails.is_expired_sale_enabled
+          // @ts-expect-error: response type is not defined
+          ? itemDetails.stock_on_hand
+          // @ts-expect-error: response type is not defined
+          : itemDetails.non_expired_stock;
+      } catch (error) {
+        console.error('Error fetching item details:', error);
+        newItems[index].description = '';
+        newItems[index].available_stock = 0;
+      }
     }
 
     setSaleItems(newItems);
@@ -157,9 +158,9 @@ export default function EditSale() {
       await updateSale(id!, payload);
       toast.success('Sale updated successfully');
       navigate('/sales');
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        setErrors(error.response.data.errors || {});
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating sale:', error);
@@ -241,8 +242,8 @@ export default function EditSale() {
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="md:col-span-1">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+                <div className="md:col-span-2">
                   <Label>Item</Label>
                   <Select
                     options={items.map(i => ({ value: String(i.id), label: i.name }))}
@@ -270,12 +271,11 @@ export default function EditSale() {
                     )}
                   </div>
                   {item.item_id && (
-                    <p className={`text-sm mt-1 ${
-                        item.available_stock === 0 ? 'text-red-500' :
+                    <p className={`text-sm mt-1 ${item.available_stock === 0 ? 'text-red-500' :
                         item.available_stock < 10 ? 'text-orange-500' :
                         'text-gray-500'
-                    }`}>
-                        Available: {item.available_stock}
+                      }`}>
+                      Available: {item.available_stock}
                     </p>
                   )}
                 </div>
@@ -292,19 +292,19 @@ export default function EditSale() {
               </div>
               <div className="grid grid-cols-1 gap-4 mt-4">
                 <div>
-                    <Label>Description</Label>
-                    <TextArea
-                        value={item.description}
-                        className="bg-gray-100 dark:bg-gray-800"
-                    />
+                  <Label>Description</Label>
+                  <TextArea
+                    value={item.description}
+                    className="bg-gray-100 dark:bg-gray-800"
+                  />
                 </div>
               </div>
               <div className="flex justify-end mt-4">
                 <div className="flex items-center space-x-4">
-                    <span className="font-semibold dark:text-gray-400">Total:</span>
-                    <span className="font-bold dark:text-white">
-                        {(item.quantity * item.unit_price).toFixed(2)}
-                    </span>
+                  <span className="font-semibold dark:text-gray-400">Total:</span>
+                  <span className="font-bold dark:text-white">
+                    {(item.quantity * item.unit_price).toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -312,10 +312,10 @@ export default function EditSale() {
 
           <div className="flex justify-end mt-6">
             <div className="flex items-center space-x-4">
-                <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
-                <span className="text-lg font-bold dark:text-white">
-                    {saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0).toFixed(2)}
-                </span>
+              <span className="text-lg font-semibold dark:text-gray-400">Net Total:</span>
+              <span className="text-lg font-bold dark:text-white">
+                {saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0).toFixed(2)}
+              </span>
             </div>
           </div>
 

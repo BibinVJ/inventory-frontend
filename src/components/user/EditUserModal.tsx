@@ -12,6 +12,7 @@ import Switch from '../form/switch/Switch';
 import { formatKebabCase } from '../../utils/string';
 import { User } from '../../types/User';
 import { Role } from '../../types/Role';
+import { isApiError } from '../../utils/errors';
 
 interface Props {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [roleId, setRoleId] = useState<number | null>(null);
+  const [roleId, setRoleId] = useState<number | undefined>(undefined);
   const [status, setStatus] = useState('active');
   const [roles, setRoles] = useState<Role[]>([]);
   const [errors, setErrors] = useState({ name: '', email: '', phone: '', role_id: '' });
@@ -34,8 +35,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
       const fetchRoles = async () => {
         try {
           const rolesData = await getRoles(1, 1, 'created_at', 'desc', true);
-          // @ts-ignore
-          setRoles(rolesData);
+          setRoles(rolesData.data);
         } catch (error) {
           console.error('Error fetching roles:', error);
           toast.error('Failed to fetch roles');
@@ -81,9 +81,16 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }: 
       onUserUpdated();
       toast.success('User updated successfully');
       onClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          email: apiErrors?.email?.[0] || '',
+          phone: apiErrors?.phone?.[0] || '',
+          role_id: apiErrors?.role_id?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating user:', error);

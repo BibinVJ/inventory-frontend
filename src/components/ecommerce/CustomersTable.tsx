@@ -81,7 +81,7 @@ export default function CustomersTable({ customers, title = "Customers" }: Props
                 {customer.phone}
               </TableCell>
               <TableCell className="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                ${customer.total_spent.toFixed(2)}
+                ${(customer.total_spent || 0).toFixed(2)}
               </TableCell>
             </TableRow>
           ))}

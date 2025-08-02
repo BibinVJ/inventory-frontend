@@ -7,7 +7,8 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { useNavigate } from 'react-router';
-import { getSales, Sale } from '../../services/SaleService';
+import { getSales } from '../../services/SaleService';
+import { Sale } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
 

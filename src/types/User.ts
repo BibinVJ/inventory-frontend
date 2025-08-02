@@ -15,3 +15,16 @@ export interface User {
   permission_names: string[];
   created_at: string;
 }
+
+export interface UserApiResponse {
+  data: User[];
+  last_page: number;
+  current_page: number;
+  from: number;
+  to: number;
+  total: number;
+}
+
+export type UserUpdatePayload = Partial<Pick<User, 'name' | 'email' | 'phone' | 'status'>> & {
+  role_id?: number;
+};

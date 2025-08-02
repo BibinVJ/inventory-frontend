@@ -33,9 +33,9 @@ Todo:
 - notification in header
 - account settings
 - support
-- profile page view/update
-
-- add side bar items
+- profile page update
+- 
+- add mobile or email authentication
 - 
 
 

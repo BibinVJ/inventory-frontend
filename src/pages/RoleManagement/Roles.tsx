@@ -7,8 +7,9 @@ import RoleTable from '../../components/role/RoleTable';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getRoles, Role } from '../../services/RoleService';
+import { getRoles } from '../../services/RoleService';
 import { useNavigate } from 'react-router';
+import { Role } from '../../types';
 
 export default function Roles() {
   const [roles, setRoles] = useState<Role[]>([]);

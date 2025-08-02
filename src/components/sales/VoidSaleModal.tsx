@@ -1,10 +1,10 @@
-
-import api from '../../services/api';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
+import { voidSale } from '../../services/SaleService';
 
 import { Sale } from '../../types';
+import { isApiError } from '../../utils/errors';
 
 interface Props {
   isOpen: boolean;
@@ -17,13 +17,17 @@ export default function VoidSaleModal({ isOpen, onClose, onSaleVoided, sale }: P
 
   const handleVoid = async () => {
     try {
-      await api.delete(`/sale/${sale.id}`);
+      await voidSale(sale.id);
       onSaleVoided();
       toast.success('Sale voided successfully');
       onClose();
-    } catch (error) {
-      console.error('Error voiding sale:', error);
-      toast.error('Failed to void sale');
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 409) {
+        toast.error(error.response?.data?.message);
+      } else {
+        console.error('Error voiding sale:', error);
+        toast.error('Failed to void sale');
+      }
     }
   };
 

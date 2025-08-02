@@ -8,7 +8,8 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
 import { useNavigate } from 'react-router';
-import { getPurchases, Purchase } from '../../services/PurchaseService';
+import { getPurchases } from '../../services/PurchaseService';
+import { Purchase } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
 

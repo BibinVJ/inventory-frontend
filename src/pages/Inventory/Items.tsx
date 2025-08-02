@@ -8,7 +8,8 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getItems, Item } from '../../services/ItemService';
+import { getItems } from '../../services/ItemService';
+import { Item } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
 

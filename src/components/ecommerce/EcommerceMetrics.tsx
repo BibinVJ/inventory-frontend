@@ -41,7 +41,12 @@ const MetricCard = ({ icon, title, value, percentage, trend }: MetricCardProps) 
   </div>
 );
 
-export default function EcommerceMetrics({ data }: { data: any }) {
+export default function EcommerceMetrics({ data }: { data: {
+  total_sales_amount: number;
+  total_purchase_amount: number;
+  total_customers: number;
+  total_items: number;
+} }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
       <MetricCard

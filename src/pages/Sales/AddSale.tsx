@@ -20,6 +20,7 @@ import AddCustomerModal from '../../components/customer/AddCustomerModal';
 import { useModal } from '../../hooks/useModal';
 import { Customer, Item } from '../../types';
 import { Plus } from 'lucide-react';
+import { isApiError } from '../../utils/errors';
 
 interface SaleItem {
   item_id: string;
@@ -57,10 +58,8 @@ export default function AddSale() {
         getItems(1, 10, 'created_at', 'desc', true),
         getNextInvoiceNumber()
       ]);
-      // @ts-ignore
-      setCustomers(customerResponse);
-      // @ts-ignore
-      setItems(itemResponse);
+      setCustomers(customerResponse.data || customerResponse);
+      setItems(itemResponse.data || itemResponse);
       if (invoiceResponse) {
         setInvoiceNumber(invoiceResponse.invoice_number);
       }
@@ -73,18 +72,18 @@ export default function AddSale() {
     setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', available_stock: 0 }]);
   };
 
-  const handleItemChange = async (index: number, field: keyof SaleItem, value: any) => {
+  const handleItemChange = async (index: number, field: keyof SaleItem, value: string | number) => {
     const newItems = [...saleItems];
     newItems[index] = { ...newItems[index], [field]: value };
 
     if (field === 'item_id' && value) {
       try {
-        const itemDetails = await getItem(value);
-        // @ts-ignore
+        const itemDetails = await getItem(String(value));
+        // @ts-expect-error: response type is not defined
         newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-        // @ts-ignore
+          // @ts-expect-error: response type is not defined
           ? itemDetails.stock_on_hand
-        // @ts-ignore
+          // @ts-expect-error: response type is not defined
           : itemDetails.non_expired_stock;
       } catch (error) {
         console.error('Error fetching item details:', error);
@@ -136,9 +135,9 @@ export default function AddSale() {
       });
       toast.success('Sale created successfully');
       navigate('/sales');
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        setErrors(error.response.data.errors || {});
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error creating sale:', error);
@@ -232,8 +231,8 @@ export default function AddSale() {
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="md:col-span-1">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+                <div className="md:col-span-2">
                   <Label>Item</Label>
                   <Select
                     options={items.map(i => ({ value: String(i.id), label: i.name }))}

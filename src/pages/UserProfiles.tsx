@@ -3,7 +3,7 @@ import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import UserInfoCard from "../components/UserProfile/UserInfoCard";
 import PageMeta from "../components/common/PageMeta";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useModal } from "../hooks/useModal";
 import EditProfileModal from "../components/UserProfile/EditProfileModal";
 
@@ -13,7 +13,7 @@ export default function UserProfiles() {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [fetchProfile]);
 
   return (
     <>

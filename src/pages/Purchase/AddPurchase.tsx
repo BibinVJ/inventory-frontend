@@ -12,9 +12,11 @@ import { useNavigate } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { formatDate } from '../../utils/date';
 import { toast } from 'sonner';
-import { getVendors, Vendor } from '../../services/VendorService';
-import { getItems, Item } from '../../services/ItemService';
+import { getVendors } from '../../services/VendorService';
+import { getItems } from '../../services/ItemService';
 import { getNextPurchaseInvoiceNumber, addPurchase } from '../../services/PurchaseService';
+import { isApiError } from '../../utils/errors';
+import { Item, Vendor } from '../../types';
 
 interface PurchaseItem {
   item_id: string;
@@ -53,10 +55,8 @@ export default function AddPurchase() {
         getItems(1, 10, 'created_at', 'desc', true),
         getNextPurchaseInvoiceNumber()
       ]);
-      // @ts-ignore
-      setVendors(vendorResponse);
-      // @ts-ignore
-      setItems(itemResponse);
+      setVendors(vendorResponse.data || vendorResponse);
+      setItems(itemResponse.data || itemResponse);
       if (invoiceResponse) {
         setInvoiceNumber(invoiceResponse.invoice_number);
       }
@@ -69,7 +69,7 @@ export default function AddPurchase() {
     setPurchaseItems([...purchaseItems, { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }]);
   };
 
-  const handleItemChange = (index: number, field: keyof PurchaseItem, value: any) => {
+  const handleItemChange = (index: number, field: keyof PurchaseItem, value: string | number) => {
     const newItems = purchaseItems.map((item, i) => {
       if (i === index) {
         return { ...item, [field]: value };
@@ -121,13 +121,13 @@ export default function AddPurchase() {
         vendor_id: vendorId,
         invoice_number: invoiceNumber,
         purchase_date: purchaseDate,
-        items: purchaseItems,
+        items: purchaseItems.map(item => ({ ...item, unit_price: item.unit_cost })),
       });
       toast.success('Purchase created successfully');
       navigate('/purchases');
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        setErrors(error.response.data.errors || {});
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error creating purchase:', error);

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getUser,
   storeUser,
@@ -7,11 +7,10 @@ import {
 } from "../services/AuthService";
 import api from "../services/api";
 
-import { AuthContextType, User } from '../types';
+import { User } from '../types';
+import { AuthContext } from "./AuthContext";
 
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export const AuthProvider = ({ children }: any) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -63,9 +62,3 @@ export const AuthProvider = ({ children }: any) => {
   );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used within an AuthProvider");
-  return context;
-};

@@ -11,9 +11,11 @@ import TextArea from '../../components/form/input/TextArea';
 import { useNavigate, useParams } from 'react-router';
 import DatePicker from '../../components/form/date-picker';
 import { toast } from 'sonner';
-import { getVendors, Vendor } from '../../services/VendorService';
-import { getItems, Item } from '../../services/ItemService';
+import { getVendors } from '../../services/VendorService';
+import { getItems } from '../../services/ItemService';
+import { Item, Vendor } from '../../types';
 import { getPurchase, updatePurchase } from '../../services/PurchaseService';
+import { isApiError } from '../../utils/errors';
 
 interface PurchaseItem {
   id?: number;
@@ -42,45 +44,42 @@ export default function EditPurchase() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const [vendorResponse, itemResponse, purchaseResponse] = await Promise.all([
+          getVendors(1, 10, 'created_at', 'desc', true),
+          getItems(1, 10, 'created_at', 'desc', true),
+          getPurchase(id!)
+        ]);
+        setVendors(vendorResponse.data || vendorResponse);
+        setItems(itemResponse.data || itemResponse);
+
+        const { vendor, invoice_number, purchase_date, items } = purchaseResponse;
+        setVendorId(String(vendor.id));
+        setInvoiceNumber(invoice_number);
+        setPurchaseDate(purchase_date);
+        setPurchaseItems(items.map((item: { id: number; item: { id: number; }; description: string; batch: { batch_number: string; expiry_date: string; manufacture_date: string; }; quantity: number; unit_cost: number; }) => ({
+          id: item.id,
+          item_id: String(item.item.id),
+          description: item.description || '',
+          batch_number: item.batch.batch_number,
+          expiry_date: item.batch.expiry_date,
+          manufacture_date: item.batch.manufacture_date,
+          quantity: item.quantity,
+          unit_cost: item.unit_cost,
+        })));
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
     fetchInitialData();
   }, [id]);
-
-  const fetchInitialData = async () => {
-    try {
-      const [vendorResponse, itemResponse, purchaseResponse] = await Promise.all([
-        getVendors(1, 10, 'created_at', 'desc', true),
-        getItems(1, 10, 'created_at', 'desc', true),
-        getPurchase(id!)
-      ]);
-      // @ts-ignore
-      setVendors(vendorResponse);
-      // @ts-ignore
-      setItems(itemResponse);
-
-      const { vendor, invoice_number, purchase_date, items } = purchaseResponse;
-      setVendorId(String(vendor.id));
-      setInvoiceNumber(invoice_number);
-      setPurchaseDate(purchase_date);
-      setPurchaseItems(items.map((item: any) => ({
-        id: item.id,
-        item_id: String(item.item.id),
-        description: item.description || '',
-        batch_number: item.batch.batch_number,
-        expiry_date: item.batch.expiry_date,
-        manufacture_date: item.batch.manufacture_date,
-        quantity: item.quantity,
-        unit_cost: item.unit_cost,
-      })));
-    } catch (error) {
-      console.error('Error fetching initial data:', error);
-    }
-  };
 
   const handleAddItem = () => {
     setPurchaseItems([...purchaseItems, { item_id: '', description: '', batch_number: '', expiry_date: '', manufacture_date: '', quantity: 1, unit_cost: 0 }]);
   };
 
-  const handleItemChange = (index: number, field: keyof PurchaseItem, value: any) => {
+  const handleItemChange = (index: number, field: keyof PurchaseItem, value: string | number) => {
     const newItems = purchaseItems.map((item, i) => {
       if (i === index) {
         return { ...item, [field]: value };
@@ -132,19 +131,16 @@ export default function EditPurchase() {
       invoice_number: invoiceNumber,
       purchase_date: purchaseDate,
       payment_status: 'pending',
-      items: purchaseItems.map(({ batch_number, ...item }) => ({
-        ...item,
-        batch_number: batch_number,
-      })),
+      items: purchaseItems.map(item => ({ ...item, unit_price: item.unit_cost })),
     };
 
     try {
       await updatePurchase(id!, payload);
       toast.success('Purchase updated successfully');
       navigate('/purchases');
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        setErrors(error.response.data.errors || {});
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating purchase:', error);

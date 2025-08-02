@@ -14,8 +14,8 @@ import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-r
 import Button from "../../ui/button/Button";
 import { PencilIcon, TrashBinIcon } from "../../../icons";
 import Tooltip from "../../ui/tooltip/Tooltip";
+import { Category } from "../../../types";
 
-import { Category } from "@/types";
 
 interface Props {
   data: Category[];

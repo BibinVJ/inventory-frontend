@@ -4,19 +4,22 @@ import { Link, useLocation } from "react-router";
 // Assume these icons are imported from an icon library
 import {
   BoxCubeIcon,
-  CalenderIcon,
+  // CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
   PageIcon,
-  PieChartIcon,
-  TableIcon,
+  // PieChartIcon,
+  // TableIcon,
   UserCircleIcon,
+  DollarLineIcon,
+  BoxIconLine,
 } from "../icons";
-import { useSidebar } from "../context/SidebarContext";
+import { useSidebar } from "../hooks/useSidebar";
 
 import { usePermissions } from "../hooks/usePermissions";
+import { ShoppingCart } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -35,7 +38,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "POS",
-    icon: <PageIcon />,
+    icon: <DollarLineIcon />,
     subItems: [
       { name: "Add Sale", path: "/sales/add", permission: "create-sale" },
     ],
@@ -47,7 +50,7 @@ const navItems: NavItem[] = [
   // },
   {
     name: "Inventory",
-    icon: <PageIcon />,
+    icon: <BoxIconLine />,
     subItems: [
       { name: "Categories", path: "/inventory/categories", permission: "view-category" },
       { name: "Units", path: "/inventory/units", permission: "view-unit" },
@@ -64,17 +67,17 @@ const navItems: NavItem[] = [
   },
   {
     name: "Purchases",
-    icon: <ListIcon />,
+    icon: <ShoppingCart />,
     subItems: [
       { name: "Vendors", path: "/vendors", permission: "view-vendor" },
       { name: "Purchases", path: "/purchases", permission: "view-purchase" },
     ],
   },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements" }],
-  },
+  // {
+  //   name: "Forms",
+  //   icon: <ListIcon />,
+  //   subItems: [{ name: "Form Elements", path: "/form-elements" }],
+  // },
   // {
   //   name: "Tables",
   //   icon: <TableIcon />,
@@ -218,7 +221,7 @@ const AppSidebar: React.FC = () => {
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => {
         const hasSubItems = nav.subItems && nav.subItems.length > 0;
-        const filteredSubItems = hasSubItems
+        const filteredSubItems = nav.subItems
           ? nav.subItems.filter(
             (subItem) => !subItem.permission || hasPermission(subItem.permission)
           )

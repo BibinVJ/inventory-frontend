@@ -23,6 +23,7 @@ import {
   PageIcon,
 } from "../../icons";
 import { Layout } from "../../types/Layout";
+import { DashboardData } from "../../types/Dashboard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -60,33 +61,33 @@ const iconMap = {
 };
 
 function Home() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<{ sales: { date: string; total: number }[]; purchases: { date: string; total: number }[] } | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [cards, setCards] = useState<any[]>([]);
-  const [originalCards, setOriginalCards] = useState<any[]>([]);
+  const [cards, setCards] = useState<Layout[]>([]);
+  const [originalCards, setOriginalCards] = useState<Layout[]>([]);
 
-  const getNestedValue = (obj: any, path: string) => {
-    if (!path) return obj;
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-  };
+  const getComponentProps = useCallback((props?: { [key: string]: string | number | object }) => {
+    const getNestedValue = (obj: DashboardData, path: string) => {
+        // @ts-expect-error: Inferred type as any
+        return path.split('.').reduce((acc, part) => acc?.[part], obj);
+    };
 
-  const getComponentProps = useCallback((props: any) => {
-    const newProps: any = {};
+    const newProps: { [key: string]: unknown } = { ...props };
+    if (!props || !data) return {};
+
     for (const key in props) {
-      if (key === 'icon') {
-        newProps[key] = iconMap[props[key] as keyof typeof iconMap];
-      } else if (typeof props[key] === 'string' && props[key].startsWith('data.')) {
-        const value = getNestedValue(data, props[key].substring(5));
-        newProps[key] = value ?? 0;
-      } else if (typeof props[key] === 'string' && props[key].startsWith('chartData.sales')) {
-        newProps[key] = chartData?.sales || [];
-      } else if (typeof props[key] === 'string' && props[key] === 'chartData') {
-        newProps[key] = chartData || { sales: [], purchases: [] };
-      } else {
-        newProps[key] = props[key];
-      }
+        if (key === 'icon' && typeof props[key] === 'string') {
+            newProps[key] = iconMap[props[key] as keyof typeof iconMap];
+        } else if (typeof props[key] === 'string' && (props[key] as string).startsWith('data.')) {
+            const value = getNestedValue(data, (props[key] as string).substring(5));
+            newProps[key] = value;
+        } else if (typeof props[key] === 'string' && (props[key] as string).startsWith('chartData.sales')) {
+            newProps[key] = chartData?.sales || [];
+        } else if (typeof props[key] === 'string' && props[key] === 'chartData') {
+            newProps[key] = chartData || { sales: [], purchases: [] };
+        }
     }
     return newProps;
   }, [data, chartData]);
@@ -106,7 +107,7 @@ function Home() {
 
         const layoutRes = await getLayout();
         if (layoutRes.data.results && layoutRes.data.results.length > 0) {
-          const adaptedLayout = layoutRes.data.results.map((item: any) => {
+          const adaptedLayout = layoutRes.data.results.map((item: Layout) => {
             const initialCard = initialCards.find(c => c.card_id === item.card_id);
             return {
               ...item,
@@ -124,20 +125,21 @@ function Home() {
           setCards(adaptedLayout);
         } else {
           setCards(initialCards);
-          const layoutToSave = initialCards.map(card => {
+          const layoutToSave: Layout[] = initialCards.map(card => {
             const { i, w, h, x, y, visible, draggable, area, rotation, col_span, config } = card;
             return {
-              card_id: i,
+              i,
+              w,
+              h,
               x,
               y,
-              width: w,
-              height: h,
               visible: visible === false ? false : true,
               draggable: draggable === false ? false : true,
               area: area || null,
               rotation: rotation || 0,
               col_span: col_span || null,
-              config: config || null,
+              config: config || undefined,
+              card_id: i,
             };
           });
           await saveLayout(layoutToSave);
@@ -152,30 +154,31 @@ function Home() {
     fetchInitialData();
   }, []);
 
-  const onLayoutChange = (newLayout: any) => {
+  const onLayoutChange = (newLayout: ReactGridLayout.Layout[]) => {
     setCards(prevCards =>
       prevCards.map(card => {
-        const layoutItem = newLayout.find((item: any) => item.i === card.i);
+        const layoutItem = newLayout.find((item) => item.i === card.i);
         return layoutItem ? { ...card, ...layoutItem } : card;
       })
     );
   };
 
   const handleSave = async () => {
-    const layoutToSave = cards.map(card => {
+    const layoutToSave: Layout[] = cards.map(card => {
       const { i, w, h, x, y, visible, draggable, area, rotation, col_span, config } = card;
       return {
-        card_id: i,
+        i,
+        w,
+        h,
         x,
         y,
-        width: w,
-        height: h,
         visible: visible === false ? false : true,
         draggable: draggable === false ? false : true,
         area: area || null,
         rotation: rotation || 0,
         col_span: col_span || null,
-        config: config || null,
+        config: config || undefined,
+        card_id: i,
       };
     });
     await saveLayout(layoutToSave);
@@ -267,10 +270,10 @@ function Home() {
           >
             {cardsToRender.map(card => {
               const Component = componentMap[card.component as keyof typeof componentMap];
-              const resolvedProps = getComponentProps(card.props);
+              const resolvedProps = getComponentProps(card.props as { [key: string]: string | number | object });
               return (
                 <div key={card.i} className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}>
-                  {Component ? <Component {...resolvedProps} /> : null}
+                  {Component ? <Component {...resolvedProps as any} /> : null}
                   {editMode && (
                     <button
                       className="absolute top-4 right-4 z-10 p-1 bg-gray-200 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 cancel-drag"

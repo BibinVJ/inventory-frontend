@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { updateCustomer } from '../../services/CustomerService';
 
 import { Customer } from '../../types';
+import { isApiError } from '../../utils/errors';
 
 interface Props {
   isOpen: boolean;
@@ -62,9 +63,16 @@ export default function EditCustomerModal({ isOpen, onClose, onCustomerUpdated, 
       onCustomerUpdated();
       toast.success('Customer updated successfully');
       onClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          email: apiErrors?.email?.[0] || '',
+          phone: apiErrors?.phone?.[0] || '',
+          address: apiErrors?.address?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating customer:', error);

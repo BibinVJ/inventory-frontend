@@ -1,6 +1,7 @@
 import api from "./api";
+import { LoginResponse } from "../types";
 
-export const login = async (email: string, password: string) => {
+export const login = async (email: string, password: string): Promise<LoginResponse> => {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("password", password);
@@ -29,7 +30,7 @@ export const logout = async () => {
   }
 };
 
-export const storeUser = (user: any, persistent = false) => {
+export const storeUser = (user: LoginResponse, persistent = false) => {
   const userString = JSON.stringify(user);
   if (persistent) {
     localStorage.setItem("user", userString);

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { SidebarProvider, useSidebar } from "../context/SidebarContext";
+import { SidebarProvider } from "../context/SidebarContext.tsx";
+import { useSidebar } from "../hooks/useSidebar";
 import { Outlet, useLocation } from "react-router";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";

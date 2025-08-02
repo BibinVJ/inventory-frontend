@@ -1,31 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import useFullScreen from "../hooks/useFullScreen";
-
-type SidebarContextType = {
-  isExpanded: boolean;
-  isMobileOpen: boolean;
-  isHovered: boolean;
-  activeItem: string | null;
-  openSubmenu: string | null;
-  isFullScreen: boolean;
-  toggleSidebar: () => void;
-  toggleMobileSidebar: () => void;
-  setIsHovered: (isHovered: boolean) => void;
-  setActiveItem: (item: string | null) => void;
-  toggleSubmenu: (item: string) => void;
-  enterFullScreen: () => void;
-  exitFullScreen: () => void;
-};
-
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider");
-  }
-  return context;
-};
+import { SidebarContext } from "./SidebarContext";
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -89,3 +64,4 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     </SidebarContext.Provider>
   );
 };
+

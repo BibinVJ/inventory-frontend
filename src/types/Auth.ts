@@ -6,9 +6,18 @@ export interface AuthContextType {
     email: string,
     password: string,
     stayLoggedIn: boolean
-  ) => Promise<any>;
+  ) => Promise<User>;
   logout: () => void;
   loading: boolean;
   fetchProfile: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
+}
+
+export interface LoginResponse {
+  results: {
+    user: User;
+    token: {
+      access_token: string;
+    };
+  };
 }

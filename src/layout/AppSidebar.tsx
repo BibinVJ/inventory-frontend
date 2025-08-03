@@ -9,7 +9,7 @@ import {
   GridIcon,
   HorizontaLDots,
   ListIcon,
-  PageIcon,
+  // PageIcon,
   // PieChartIcon,
   // TableIcon,
   UserCircleIcon,

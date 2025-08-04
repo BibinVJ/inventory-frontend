@@ -1,16 +1,14 @@
 # Pharmacy Management
 This is the frontend for pharmacy management app.
 
+## System Requirements
+- Node.js v18.18.0 or higher (LTS recommended)
+- npm v9.x.x or v10.x.x
 
-### Other Versions
-- [Next.js Version](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
 
 ## Installation
 
 ### Prerequisites
-To get started with TailAdmin, ensure you have the following prerequisites installed and set up:
-- Node.js 18.x or later (recommended to use Node.js 20.x or later)
-
 1. Install dependencies:
 
    ```bash
@@ -31,8 +29,6 @@ To get started with TailAdmin, ensure you have the following prerequisites insta
 Todo:
 
 - notification in header
-- account settings
-- support
 - profile page view/update
 
 - add side bar items

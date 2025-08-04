@@ -135,7 +135,7 @@ export default function EditProfileModal({
                 <Select
                   options={genderOptions}
                   onChange={handleSelectChange}
-                  defaultValue={formData.gender}
+                  defaultValue={formData.gender ?? undefined}
                 />
               </div>
             </div>

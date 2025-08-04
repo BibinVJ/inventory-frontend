@@ -1,14 +1,12 @@
-import { FC, forwardRef } from "react";
+import { forwardRef } from "react";
 
 interface FileInputProps {
   className?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const FileInput: FC<FileInputProps> = forwardRef<
-  HTMLInputElement,
-  FileInputProps
->(({ className, onChange }, ref) => {
+const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
+  ({ className, onChange }, ref) => {
   return (
     <input
       type="file"

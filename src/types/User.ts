@@ -8,7 +8,7 @@ export interface Address {
   state: string;
   country: string;
   postal_code: string;
-  meta: any;
+  meta: Record<string, unknown>;
 }
 
 export interface SocialLink {

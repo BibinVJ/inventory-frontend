@@ -1,6 +1,7 @@
+import { Address, SocialLink, User } from "../types";
 import api from "./api";
 
-export const updateProfile = async (data: any) => {
+export const updateProfile = async (data: Partial<User>) => {
   const response = await api.post("/profile", data, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -9,7 +10,7 @@ export const updateProfile = async (data: any) => {
   return response.data;
 };
 
-export const updateAddress = async (data: any) => {
+export const updateAddress = async (data: Partial<Address>) => {
   const response = await api.post("/profile/address", data, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -18,7 +19,7 @@ export const updateAddress = async (data: any) => {
   return response.data;
 };
 
-export const updateSocialLinks = async (data: any) => {
+export const updateSocialLinks = async (data: { social_links: SocialLink[] }) => {
   const response = await api.post("/profile/social-links", data, {
     headers: {
       "Content-Type": "multipart/form-data",

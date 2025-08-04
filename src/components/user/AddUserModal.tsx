@@ -95,7 +95,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
 
     try {
-      await createUser({ name, email, phone, password, role_id: roleId, profile_image: null });
+      await createUser({ name, email, phone, password, role_id: roleId, profile_image: null, alternate_email: null, alternate_phone: null, id_proof_type: null, id_proof_number: null, dob: null, gender: null, addresses: [], social_links: [] });
       onUserAdded();
       toast.success('User added successfully');
       handleClose();

@@ -5,7 +5,7 @@ interface UserInfoCardProps {
   onEdit: () => void;
 }
 
-export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
+export default function UserInfoCard({ user }: UserInfoCardProps) {
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -36,14 +36,6 @@ export default function UserInfoCard({ user, onEdit }: UserInfoCardProps) {
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                 {user?.phone || "-"}
-              </p>
-            </div>
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Bio
-              </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.bio || "-"}
               </p>
             </div>
           </div>

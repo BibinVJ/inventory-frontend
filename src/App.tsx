@@ -10,7 +10,8 @@ import AppLayout from "./layout/AppLayout";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
+// import { useAuth } from "./context/AuthContext";
 
 
 const Dashboard = lazy(() => import("./pages/Dashboard/Home"));

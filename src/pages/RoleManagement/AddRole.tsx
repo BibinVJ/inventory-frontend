@@ -13,9 +13,9 @@ import Switch from '../../components/form/switch/Switch';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import Checkbox from '../../components/form/input/Checkbox';
 import Button from '../../components/ui/button/Button';
-
 import { formatKebabCase } from '../../utils/string';
 import { Permission } from '../../types/Permission';
+import { isApiError } from '../../utils/errors';
 
 export default function AddRole() {
   const [name, setName] = useState('');
@@ -46,7 +46,6 @@ export default function AddRole() {
       setErrors({ ...errors, name: '' });
     }
   };
-
 
   const { groupedPermissions, allActions } = useMemo(() => {
     const actionsOrder = ['view', 'create', 'update', 'delete', 'manage'];
@@ -118,8 +117,19 @@ export default function AddRole() {
       await createRole({ name, permissions: selectedPermissions, is_active: isActive });
       toast.success('Role added successfully');
       navigate('/roles');
-    } catch (error: any) {
-      // Error handling...
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          permissions: apiErrors?.permissions?.[0] || '',
+        };
+        setErrors(newErrors);
+        toast.error('Please correct the errors in the form');
+      } else {
+        console.error('Error creating role:', error);
+        toast.error('Failed to create role');
+      }
     }
   };
 

@@ -9,9 +9,10 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getCustomers, Customer } from '../../services/CustomerService';
+import { getCustomers } from '../../services/CustomerService';
 
 import { usePermissions } from '../../hooks/usePermissions';
+import { Customer } from '../../types';
 
 export default function Customers() {
   const { hasPermission } = usePermissions();
@@ -28,13 +29,13 @@ export default function Customers() {
 
   const fetchCustomers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getCustomers(page, limit, sortCol, sortDir);
-      setCustomers(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getCustomers(page, limit, sortCol, sortDir);
+      setCustomers(response.data);
+      setTotalPages(response.last_page);
+      setCurrentPage(response.current_page);
+      setFrom(response.from);
+      setTo(response.to);
+      setTotal(response.total);
     } catch (error) {
       console.error('Error fetching customers:', error);
     }

@@ -1,5 +1,4 @@
-import { UserApiResponse } from '../types/Permission';
-import { User } from '../types/User';
+import { User, UserApiResponse, UserUpdatePayload } from '../types/User';
 import api from './api';
 
 export const getUsers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc'): Promise<UserApiResponse> => {
@@ -12,12 +11,12 @@ export const getUser = async (id: string): Promise<User> => {
     return response.data.results;
 };
 
-export const createUser = async (userData: Omit<User, 'id' | 'status' | 'is_admin' | 'permissions' | 'created_at' | 'email_verified_at' | 'phone_verified_at' | 'status_updated_at' | 'profile_image'>) => {
+export const createUser = async (userData: Omit<User, 'id' | 'status' | 'is_admin' | 'role' | 'permission_names' | 'created_at' | 'email_verified_at' | 'phone_verified_at' | 'status_updated_at'> & { password?: string; role_id?: number }) => {
   const response = await api.post('/user', userData);
   return response.data;
 };
 
-export const updateUser = async (id: number, userData: Partial<User>) => {
+export const updateUser = async (id: number, userData: UserUpdatePayload) => {
   const response = await api.put(`/user/${id}`, userData);
   return response.data;
 };

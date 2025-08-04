@@ -9,7 +9,8 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getCategories, Category } from '../../services/CategoryService';
+import { getCategories } from '../../services/CategoryService';
+import { Category } from '../../types';
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -5,14 +5,18 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import Divider from "../common/Divider";
 import SocialButton from "../ui/button/SocialButton";
 import GoogleIcon from "../../icons/GoogleIcon";
 import XIcon from "../../icons/XIcon";
+import { toast } from "sonner";
+import { isApiError } from '../../utils/errors';
+
 
 export default function SignInForm() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,17 +27,40 @@ export default function SignInForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+    setErrors({ ...errors, [name]: "" });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!form.email) {
+      setErrors({ ...errors, email: 'Email is required' });
+      return;
+    }
+
+    if (!form.password) {
+      setErrors({ ...errors, password: 'Password is required' });
+      return;
+    }
+
+
     setLoading(true);
 
     try {
       await login(form.email, form.password, stayLoggedIn);
       navigate("/");
-    } catch (err: any) {
-      // err
+    } catch (err: unknown) {
+      if (isApiError(err)) {
+        const message = err.response?.data?.message || "An error occurred";
+        console.log(err.response);
+        setErrors({
+          email: err.response?.data?.errors?.email?.[0] || " ",
+          password: err.response?.data?.errors?.password?.[0] || " ",
+        });
+        toast.error(message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -75,6 +102,8 @@ export default function SignInForm() {
                   onChange={handleChange}
                   placeholder="Email"
                   autoComplete="email"
+                  error={!!errors.email}
+                  hint={errors.email}
                 />
               </div>
               <div>
@@ -88,6 +117,8 @@ export default function SignInForm() {
                   onChange={handleChange}
                   placeholder="Password"
                   autoComplete="current-password"
+                  error={!!errors.password}
+                  hint={errors.password}
                   rightIcon={
                     showPassword ? (
                       <EyeIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />

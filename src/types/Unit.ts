@@ -7,6 +7,10 @@ export interface Unit {
 }
 
 export interface UnitApiResponse {
-  results: Unit[];
-  count: number;
+  data: Unit[];
+  last_page: number;
+  current_page: number;
+  from: number;
+  to: number;
+  total: number;
 }

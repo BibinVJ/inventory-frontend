@@ -29,10 +29,9 @@ This is the frontend for pharmacy management app.
 Todo:
 
 - notification in header
-- profile page view/update
+- profile page update
 
 - add side bar items
-- 
 
 
 

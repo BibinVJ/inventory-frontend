@@ -60,19 +60,15 @@ export default function EditProfileModal({ isOpen, onClose, user }: EditProfileM
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div className="col-span-2">
                   <Label>Full Name</Label>
-                  <Input type="text" defaultValue={user?.name} />
+                  <Input type="text" value={user?.name} />
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <Label>Email Address</Label>
-                  <Input type="text" defaultValue={user?.email} />
+                  <Input type="text" value={user?.email} />
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <Label>Phone</Label>
-                  <Input type="text" defaultValue={user?.phone || ''} />
-                </div>
-                <div className="col-span-2">
-                  <Label>Bio</Label>
-                  <Input type="text" defaultValue={user?.bio || 'Team Manager'} />
+                  <Input type="text" value={user?.phone || ''} />
                 </div>
               </div>
             </div>

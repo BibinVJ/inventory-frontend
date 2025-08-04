@@ -8,8 +8,9 @@ import TextArea from '../../form/input/TextArea';
 import Button from '../../ui/button/Button';
 import { toast } from 'sonner';
 import { updateCategory } from '../../../services/CategoryService';
+import { Category } from '../../../types';
+import { isApiError } from '../../../utils/errors';
 
-import { Category } from '@/types';
 
 interface Props {
   isOpen: boolean;
@@ -44,9 +45,13 @@ export default function EditCategoryModal({ isOpen, onClose, onCategoryUpdated, 
       onCategoryUpdated();
       toast.success('Category updated successfully');
       onClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error adding category:', error);

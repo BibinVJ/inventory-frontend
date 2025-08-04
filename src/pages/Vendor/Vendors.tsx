@@ -9,7 +9,8 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getVendors, Vendor } from '../../services/VendorService';
+import { getVendors } from '../../services/VendorService';
+import { Vendor } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
 

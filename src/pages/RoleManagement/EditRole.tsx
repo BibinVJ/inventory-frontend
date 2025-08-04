@@ -17,6 +17,7 @@ import Button from '../../components/ui/button/Button';
 import { formatKebabCase } from '../../utils/string';
 import { Permission } from '../../types/Permission';
 import { Role } from '../../types/Role';
+import { isApiError } from '../../utils/errors';
 
 export default function EditRole() {
   const { id } = useParams<{ id: string }>();
@@ -128,8 +129,19 @@ export default function EditRole() {
       await updateRole(role!.id, { name, permissions: selectedPermissions, is_active: isActive });
       toast.success('Role updated successfully');
       navigate('/roles');
-    } catch (error: any) {
-      // Error handling...
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          permissions: apiErrors?.permissions?.[0] || '',
+        };
+        setErrors(newErrors);
+        toast.error('Please correct the errors in the form');
+      } else {
+        console.error('Error updating role:', error);
+        toast.error('Failed to update role');
+      }
     }
   };
 

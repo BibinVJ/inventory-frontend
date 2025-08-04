@@ -8,10 +8,10 @@ import Button from '../../ui/button/Button';
 import Select from '../../form/Select';
 import { toast } from 'sonner';
 import { updateItem } from '../../../services/ItemService';
-import { getCategories, Category } from '../../../services/CategoryService';
-import { getUnits, Unit } from '../../../services/UnitService';
-
-import { Item } from '../../../types';
+import { getCategories } from '../../../services/CategoryService';
+import { getUnits } from '../../../services/UnitService';
+import { isApiError } from '../../../utils/errors';
+import { Category, Item, Unit } from '../../../types';
 
 interface Props {
   isOpen: boolean;
@@ -54,8 +54,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const fetchCategories = async () => {
     try {
       const response = await getCategories(1, 10, 'created_at', 'desc', true);
-      // @ts-ignore
-      setCategories(response);
+      setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -64,8 +63,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const fetchUnits = async () => {
     try {
       const response = await getUnits(1, 10, 'created_at', 'desc', true);
-      // @ts-ignore
-      setUnits(response);
+      setUnits(response.data);
     } catch (error) {
       console.error('Error fetching units:', error);
     }
@@ -112,9 +110,17 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
       onItemUpdated();
       toast.success('Item updated successfully');
       onClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          sku: apiErrors?.sku?.[0] || '',
+          name: apiErrors?.name?.[0] || '',
+          category_id: apiErrors?.category_id?.[0] || '',
+          unit_id: apiErrors?.unit_id?.[0] || '',
+          type: apiErrors?.type?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating item:', error);

@@ -8,6 +8,10 @@ export interface Vendor {
 }
 
 export interface VendorApiResponse {
-  results: Vendor[];
-  count: number;
+  data: Vendor[];
+  last_page: number;
+  current_page: number;
+  from: number;
+  to: number;
+  total: number;
 }

@@ -10,6 +10,7 @@ import { getRoles } from '../../services/RoleService';
 import Select from '../form/Select';
 import { formatKebabCase } from '../../utils/string';
 import { Role } from '../../types/Role';
+import { isApiError } from '../../utils/errors';
 
 interface Props {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [roleId, setRoleId] = useState<number | null>(null);
+  const [roleId, setRoleId] = useState<number | undefined>(undefined);
   const [roles, setRoles] = useState<Role[]>([]);
   const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '', role_id: '' });
 
@@ -31,8 +32,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
       const fetchRoles = async () => {
         try {
           const rolesData = await getRoles(1, 1, 'created_at', 'desc', true);
-          // @ts-ignore
-          setRoles(rolesData);
+          setRoles(rolesData.data);
         } catch (error) {
           console.error('Error fetching roles:', error);
           toast.error('Failed to fetch roles');
@@ -47,7 +47,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     setEmail('');
     setPhone('');
     setPassword('');
-    setRoleId(null);
+    setRoleId(undefined);
     setErrors({ name: '', email: '', phone: '', password: '', role_id: '' });
   };
 
@@ -95,13 +95,21 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
 
     try {
-      await createUser({ name, email, phone, password, role_id: roleId });
+      await createUser({ name, email, phone, password, role_id: roleId, profile_image: null });
       onUserAdded();
       toast.success('User added successfully');
       handleClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          email: apiErrors?.email?.[0] || '',
+          phone: apiErrors?.phone?.[0] || '',
+          password: apiErrors?.password?.[0] || '',
+          role_id: apiErrors?.role_id?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error adding user:', error);
@@ -110,7 +118,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     }
   };
 
-  const roleOptions = roles.map(r => ({ value: r.id, label: formatKebabCase(r.name) }));
+  const roleOptions = roles.map(r => ({ value: String(r.id), label: formatKebabCase(r.name) }));
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] lg:p-11">

@@ -8,7 +8,7 @@ import TextArea from '../form/input/TextArea';
 import Button from '../ui/button/Button';
 import { toast } from 'sonner';
 import { updateVendor } from '../../services/VendorService';
-
+import { isApiError } from '../../utils/errors';
 import { Vendor } from '../../types';
 
 interface Props {
@@ -62,9 +62,16 @@ export default function EditVendorModal({ isOpen, onClose, onVendorUpdated, vend
       onVendorUpdated();
       toast.success('Vendor updated successfully');
       onClose();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      if (isApiError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data.errors;
+        const newErrors = {
+          name: apiErrors?.name?.[0] || '',
+          email: apiErrors?.email?.[0] || '',
+          phone: apiErrors?.phone?.[0] || '',
+          address: apiErrors?.address?.[0] || '',
+        };
+        setErrors(newErrors);
         toast.error('Please correct the errors in the form');
       } else {
         console.error('Error updating vendor:', error);

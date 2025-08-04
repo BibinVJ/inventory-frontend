@@ -5,7 +5,14 @@ import { useState, useEffect } from "react";
 
 type Period = "monthly" | "quarterly" | "annually";
 
-export default function StatisticsChart({ data }: { data: any }) {
+interface StatisticsChartProps {
+  data: {
+    sales: { date: string; total: number }[];
+    purchases: { date: string; total: number }[];
+  };
+}
+
+export default function StatisticsChart({ data }: StatisticsChartProps) {
   const [period, setPeriod] = useState<Period>("monthly");
   const [chartSeries, setChartSeries] = useState<{ name: string; data: number[] }[]>([]);
   const [chartOptions, setChartOptions] = useState<ApexOptions>({});
@@ -20,24 +27,24 @@ export default function StatisticsChart({ data }: { data: any }) {
       let purchasesData: number[] = [];
 
       if (period === 'annually') {
-        const allDates = [...new Set([...sales.map((s: any) => s.date), ...purchases.map((p: any) => p.date)])].sort();
-        const salesMap = new Map(sales.map((s: any) => [s.date, s.total]));
-        const purchasesMap = new Map(purchases.map((p: any) => [p.date, p.total]));
+        const allDates = [...new Set([...sales.map((s) => s.date), ...purchases.map((p) => p.date)])].sort();
+        const salesMap = new Map(sales.map((s) => [s.date, s.total]));
+        const purchasesMap = new Map(purchases.map((p) => [p.date, p.total]));
         
         categories = allDates.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        salesData = allDates.map(date => salesMap.get(date) || 0) as number[];
-        purchasesData = allDates.map(date => purchasesMap.get(date) || 0) as number[];
+        salesData = allDates.map(date => salesMap.get(date) || 0);
+        purchasesData = allDates.map(date => purchasesMap.get(date) || 0);
 
       } else if (period === 'monthly') {
         categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const monthlySales: number[] = new Array(12).fill(0);
         const monthlyPurchases: number[] = new Array(12).fill(0);
 
-        sales.forEach((s: any) => {
+        sales.forEach((s) => {
           const month = new Date(s.date).getMonth();
           monthlySales[month] += s.total;
         });
-        purchases.forEach((p: any) => {
+        purchases.forEach((p) => {
           const month = new Date(p.date).getMonth();
           monthlyPurchases[month] += p.total;
         });
@@ -51,11 +58,11 @@ export default function StatisticsChart({ data }: { data: any }) {
 
         const getQuarter = (date: Date) => Math.floor(date.getMonth() / 3);
 
-        sales.forEach((s: any) => {
+        sales.forEach((s) => {
           const quarter = getQuarter(new Date(s.date));
           quarterlySales[quarter] += s.total;
         });
-        purchases.forEach((p: any) => {
+        purchases.forEach((p) => {
           const quarter = getQuarter(new Date(p.date));
           quarterlyPurchases[quarter] += p.total;
         });

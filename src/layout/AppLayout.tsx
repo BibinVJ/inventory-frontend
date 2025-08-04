@@ -1,19 +1,25 @@
 import { useEffect } from "react";
-import { SidebarProvider, useSidebar } from "../context/SidebarContext";
+import { SidebarProvider } from "../context/SidebarContext.tsx";
+import { useSidebar } from "../hooks/useSidebar";
 import { Outlet, useLocation } from "react-router";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
 
 const LayoutContent: React.FC = () => {
-  const { isExpanded, isHovered, isMobileOpen, isFullScreen, toggleFullScreen } = useSidebar();
+  const { isExpanded, isHovered, isMobileOpen, isFullScreen, enterFullScreen, exitFullScreen } = useSidebar();
   const location = useLocation();
 
   useEffect(() => {
-    if (isFullScreen && location.pathname !== '/sales/add') {
-      toggleFullScreen();
+    const shouldGoFullScreen = location.state?.goFullScreen;
+    if (shouldGoFullScreen) {
+      enterFullScreen();
+    } else {
+      if (isFullScreen) {
+        exitFullScreen();
+      }
     }
-  }, [location, isFullScreen, toggleFullScreen]);
+  }, [location, isFullScreen, enterFullScreen, exitFullScreen]);
 
   if (isFullScreen) {
     return (

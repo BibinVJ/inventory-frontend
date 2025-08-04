@@ -9,7 +9,8 @@ import { useModal } from '../../hooks/useModal';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
-import { getUnits, Unit } from '../../services/UnitService';
+import { getUnits } from '../../services/UnitService';
+import { Unit } from '../../types';
 
 import { usePermissions } from '../../hooks/usePermissions';
 

@@ -10,7 +10,7 @@ export interface Layout {
   col_span?: number | null;
   draggable?: boolean;
   visible: boolean;
-  config?: any;
+  config?: Record<string, unknown>;
 
   // react-grid-layout properties
   i: string;
@@ -22,5 +22,5 @@ export interface Layout {
 
   // component rendering properties
   component?: string;
-  props?: any;
+  props?: Record<string, unknown>;
 }

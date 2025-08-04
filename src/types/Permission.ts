@@ -1,12 +1,10 @@
-import { User } from "./User";
-
 export interface Permission {
   id: number;
   name: string;
 }
 
-export interface UserApiResponse {
-  data: User[];
+export interface PermissionApiResponse {
+  data: Permission[];
   last_page: number;
   current_page: number;
   from: number;

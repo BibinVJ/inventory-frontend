@@ -1,7 +1,14 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
-export default function MonthlySalesChart({ data }: { data: any}) {
+interface MonthlySalesChartProps {
+  data: {
+    date: string;
+    total: number;
+  }[];
+}
+
+export default function MonthlySalesChart({ data }: MonthlySalesChartProps) {
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -84,7 +91,7 @@ export default function MonthlySalesChart({ data }: { data: any}) {
   const monthlySales = Array(12).fill(0);
 
   if (data) {
-    data.forEach((d: any) => {
+    data.forEach((d: { date: string; total: number }) => {
       const month = new Date(d.date).getMonth();
       monthlySales[month] += d.total;
     });

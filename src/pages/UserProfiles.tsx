@@ -1,19 +1,33 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import UserInfoCard from "../components/UserProfile/UserInfoCard";
 import PageMeta from "../components/common/PageMeta";
 import { useAuth } from "../hooks/useAuth";
-import { useModal } from "../hooks/useModal";
+import UserAddressCard from "../components/UserProfile/UserAddressCard";
 import EditProfileModal from "../components/UserProfile/EditProfileModal";
+import EditAddressModal from "../components/UserProfile/EditAddressModal";
+import EditSocialLinksModal from "../components/UserProfile/EditSocialLinksModal";
+import EditProfileImageModal from "../components/UserProfile/EditProfileImageModal";
 
 export default function UserProfiles() {
   const { fetchProfile, user } = useAuth();
-  const { isOpen, openModal, closeModal } = useModal();
+  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  const [isAddressModalOpen, setAddressModalOpen] = useState(false);
+  const [isSocialLinksModalOpen, setSocialLinksModalOpen] = useState(false);
+  const [isProfileImageModalOpen, setProfileImageModalOpen] = useState(false);
+  const [selectedAddressType, setSelectedAddressType] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const handleEditAddress = (addressType: string) => {
+    setSelectedAddressType(addressType);
+    setAddressModalOpen(true);
+  };
 
   return (
     <>
@@ -27,12 +41,35 @@ export default function UserProfiles() {
           Profile
         </h3>
         <div className="space-y-6">
-          <UserMetaCard user={user} onEdit={openModal} />
-          <UserInfoCard user={user} onEdit={openModal} />
-          {/* <UserAddressCard /> */}
+          <UserMetaCard
+            user={user}
+            onEditSocials={() => setSocialLinksModalOpen(true)}
+            onEditImage={() => setProfileImageModalOpen(true)}
+          />
+          <UserInfoCard user={user} onEdit={() => setProfileModalOpen(true)} />
+          <UserAddressCard user={user} onEdit={handleEditAddress} />
         </div>
       </div>
-      <EditProfileModal isOpen={isOpen} onClose={closeModal} user={user} />
+      <EditProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={user}
+      />
+      <EditAddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setAddressModalOpen(false)}
+        user={user}
+        addressType={selectedAddressType}
+      />
+      <EditSocialLinksModal
+        isOpen={isSocialLinksModalOpen}
+        onClose={() => setSocialLinksModalOpen(false)}
+        user={user}
+      />
+      <EditProfileImageModal
+        isOpen={isProfileImageModalOpen}
+        onClose={() => setProfileImageModalOpen(false)}
+      />
     </>
   );
 }

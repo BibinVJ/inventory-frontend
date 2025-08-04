@@ -16,6 +16,7 @@ import { PencilIcon, TrashBinIcon } from "../../icons";
 import Tooltip from "../ui/tooltip/Tooltip";
 
 import { Customer } from '../../types';
+import { usePermissions } from "../../hooks/usePermissions";
 
 interface Props {
   data: Customer[];
@@ -27,7 +28,6 @@ interface Props {
   perPage: number;
 }
 
-import { usePermissions } from "../../hooks/usePermissions";
 
 export default function CustomerTable({ data, onAction, onSort, sortBy, sortDirection, currentPage, perPage }: Props) {
   const { hasPermission } = usePermissions();

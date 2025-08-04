@@ -3,59 +3,70 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
-import { User } from "../../types";
-import { updateProfile } from "../../services/ProfileService";
+import { Address, User } from "../../types";
+import { updateAddress } from "../../services/ProfileService";
 import { useAuth } from "../../hooks/useAuth";
 import Select from "../form/Select";
 import { toast } from "sonner";
 import { isApiError } from "../../utils/errors";
-import DatePicker from "../form/date-picker";
 
-interface EditProfileModalProps {
+interface EditAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
+  addressType: string | null;
 }
 
-const genderOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
+const addressTypes = [
+  { value: "primary", label: "Primary" },
+  { value: "secondary", label: "Secondary" },
+  { value: "billing", label: "Billing" },
+  { value: "shipping", label: "Shipping" },
 ];
 
-export default function EditProfileModal({
+export default function EditAddressModal({
   isOpen,
   onClose,
   user,
-}: EditProfileModalProps) {
+  addressType,
+}: EditAddressModalProps) {
   const { fetchProfile } = useAuth();
-  const [formData, setFormData] = useState<Partial<User>>({});
+  const [formData, setFormData] = useState<Partial<Address>>({});
 
   useEffect(() => {
-    if (user) {
-      setFormData(user);
+    if (user && addressType && addressType !== "new") {
+      const address = user.addresses.find((a) => a.type === addressType);
+      if (address) {
+        setFormData(address);
+      }
+    } else {
+      setFormData({
+        type: "primary",
+        address_line_1: "",
+        address_line_2: "",
+        city: "",
+        state: "",
+        country: "",
+        postal_code: "",
+      });
     }
-  }, [user]);
+  }, [user, addressType]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, gender: value }));
-  };
-
-  const handleDateChange = (selectedDates: Date[]) => {
-    if (selectedDates.length > 0) {
-      setFormData((prev) => ({ ...prev, dob: selectedDates[0].toISOString() }));
-    }
+    setFormData((prev) => ({ ...prev, type: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await updateProfile(formData);
+      const response = await updateAddress(formData);
       toast.success(response.message);
       fetchProfile();
       onClose();
@@ -73,7 +84,7 @@ export default function EditProfileModal({
       <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-11">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Edit Personal Information
+            {addressType === "new" ? "Add New Address" : "Edit Address"}
           </h4>
           <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
             Update your details to keep your profile up-to-date.
@@ -83,59 +94,60 @@ export default function EditProfileModal({
           <div className="px-2 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>Full Name</Label>
-                <Input
-                  name="name"
-                  value={formData.name || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Alternate Email</Label>
-                <Input
-                  name="alternate_email"
-                  value={formData.alternate_email || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Alternate Phone</Label>
-                <Input
-                  name="alternate_phone"
-                  value={formData.alternate_phone || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>ID Proof Type</Label>
-                <Input
-                  name="id_proof_type"
-                  value={formData.id_proof_type || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>ID Proof Number</Label>
-                <Input
-                  name="id_proof_number"
-                  value={formData.id_proof_number || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <DatePicker
-                  id="dob"
-                  label="Date of Birth"
-                  onChange={handleDateChange}
-                  defaultDate={formData.dob ? new Date(formData.dob) : undefined}
-                />
-              </div>
-              <div>
-                <Label>Gender</Label>
+                <Label>Type</Label>
                 <Select
-                  options={genderOptions}
+                  options={addressTypes}
                   onChange={handleSelectChange}
-                  defaultValue={formData.gender}
+                  defaultValue={formData.type}
+                  className={addressType !== "new" ? "pointer-events-none" : ""}
+                />
+              </div>
+              <div>
+                <Label>Address Line 1</Label>
+                <Input
+                  name="address_line_1"
+                  value={formData.address_line_1 || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>Address Line 2</Label>
+                <Input
+                  name="address_line_2"
+                  value={formData.address_line_2 || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>City</Label>
+                <Input
+                  name="city"
+                  value={formData.city || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>State</Label>
+                <Input
+                  name="state"
+                  value={formData.state || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input
+                  name="country"
+                  value={formData.country || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>Postal Code</Label>
+                <Input
+                  name="postal_code"
+                  value={formData.postal_code || ""}
+                  onChange={handleChange}
                 />
               </div>
             </div>

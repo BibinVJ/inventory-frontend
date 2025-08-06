@@ -62,7 +62,7 @@ export default function Roles() {
   return (
     <>
       <PageMeta
-        title="Roles | Pharmacy Manager"
+        title="Roles"
         description="List of roles"
       />
       <PageBreadcrumb pageTitle="Roles" />

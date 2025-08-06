@@ -169,7 +169,7 @@ export default function EditPurchase() {
   return (
     <>
       <PageMeta
-        title="Edit Purchase | Pharmacy Manager"
+        title="Edit Purchase"
         description="Edit an existing purchase"
       />
       <PageBreadcrumb pageTitle="Edit Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true} />

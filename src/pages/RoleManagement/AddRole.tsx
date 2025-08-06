@@ -137,7 +137,7 @@ export default function AddRole() {
 
   return (
     <>
-      <PageMeta title="Add Role | Pharmacy Manager" description="Add a new role" />
+      <PageMeta title="Add Role" description="Add a new role" />
       <PageBreadcrumb pageTitle="Add Role" breadcrumbs={[{ label: 'Roles', path: '/roles' }]} backButton />
       <ComponentCard>
         <form onSubmit={handleSubmit}>

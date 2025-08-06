@@ -47,7 +47,7 @@ export default function ViewPurchase() {
   return (
     <>
       <PageMeta
-        title={`Purchase #${purchase.invoice_number} | Pharmacy Manager`}
+        title={`Purchase #${purchase.invoice_number}`}
         description="View purchase details"
       />
       <PageBreadcrumb

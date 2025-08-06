@@ -167,7 +167,7 @@ export default function AddSale() {
   return (
     <>
       <PageMeta
-        title="Add Sale | Pharmacy Manager"
+        title="Add Sale"
         description="Add a new sale"
       />
       <PageBreadcrumb pageTitle="Add Sale" breadcrumbs={[{ label: 'Sales', path: '/sales' }]} backButton={true}/>

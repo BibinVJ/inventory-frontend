@@ -156,7 +156,7 @@ export default function AddPurchase() {
   return (
     <>
       <PageMeta
-        title="Add Purchase | Pharmacy Manager"
+        title="Add Purchase"
         description="Add a new purchase"
       />
       <PageBreadcrumb pageTitle="Add Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true}/>

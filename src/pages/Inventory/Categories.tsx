@@ -63,7 +63,7 @@ export default function Categories() {
   return (
     <>
       <PageMeta
-        title="Categories | Pharmacy Manager"
+        title="Categories"
         description="List of categories"
       />
       <PageBreadcrumb pageTitle="Categories" />

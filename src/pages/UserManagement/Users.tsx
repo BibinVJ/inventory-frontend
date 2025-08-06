@@ -63,7 +63,7 @@ export default function Users() {
   return (
     <>
       <PageMeta
-        title="Users | Pharmacy Manager"
+        title="Users"
         description="List of users"
       />
       <PageBreadcrumb pageTitle="Users" />

@@ -66,7 +66,7 @@ export default function Vendors() {
   return (
     <>
       <PageMeta
-        title="Vendors | Pharmacy Manager"
+        title="Vendors"
         description="List of vendors"
       />
       <PageBreadcrumb pageTitle="Vendors" />

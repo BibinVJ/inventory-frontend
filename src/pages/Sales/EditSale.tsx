@@ -184,7 +184,7 @@ export default function EditSale() {
   return (
     <>
       <PageMeta
-        title="Edit Sale | Pharmacy Manager"
+        title="Edit Sale"
         description="Edit an existing sale"
       />
       <PageBreadcrumb pageTitle="Edit Sale" breadcrumbs={[{ label: 'Sales', path: '/sales' }]} backButton={true} />

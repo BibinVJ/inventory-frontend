@@ -64,7 +64,7 @@ export default function Sales() {
   return (
     <>
       <PageMeta
-        title="Sales | Pharmacy Manager"
+        title="Sales"
         description="List of sales"
       />
       <PageBreadcrumb pageTitle="Sales" />

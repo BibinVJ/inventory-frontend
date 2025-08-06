@@ -65,7 +65,7 @@ export default function Purchases() {
   return (
     <>
       <PageMeta
-        title="Purchases | Pharmacy Manager"
+        title="Purchases"
         description="List of purchases"
       />
       <PageBreadcrumb pageTitle="Purchases" />

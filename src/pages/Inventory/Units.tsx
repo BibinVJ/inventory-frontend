@@ -66,7 +66,7 @@ export default function Units() {
   return (
     <>
       <PageMeta
-        title="Units | Pharmacy Manager"
+        title="Units"
         description="List of units"
       />
       <PageBreadcrumb pageTitle="Units" />

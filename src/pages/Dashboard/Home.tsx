@@ -236,8 +236,8 @@ function Home() {
   return (
     <>
       <PageMeta
-        title="Ecommerce Dashboard | Pharmacy Manager"
-        description="This is the ecommerce dashboard page for Pharmacy Manager"
+        title="Ecommerce Dashboard"
+        description="Ecommerce dashboard page"
       />
       <div>
         <div className="flex justify-end gap-2 mb-4">
@@ -270,9 +270,10 @@ function Home() {
           >
             {cardsToRender.map(card => {
               const Component = componentMap[card.component as keyof typeof componentMap];
-              const resolvedProps = getComponentProps(card.props as { [key: string]: string | number | object });
+              const resolvedProps = getComponentProps(card.props as { [key:string]: string | number | object });
               return (
                 <div key={card.i} className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {Component ? <Component {...resolvedProps as any} /> : null}
                   {editMode && (
                     <button

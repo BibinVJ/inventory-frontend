@@ -1,24 +1,26 @@
-# Pharmacy Management
-This is the **frontend** for the **Pharmacy Management System**, built with React, Vite, TailwindCSS, and TypeScript.
-
----
+# Inventory Manager
+This is the **frontend** for the **Inventory Manager**, built with **React**, **Vite**, **TailwindCSS**, and **TypeScript**.
 
 ## System Requirements
-- **Node.js** v18.18.0 or higher (**LTS recommended**)
-- **npm** v9.x.x or v10.x.x
+- **Node.js** v20.0 or higher (**LTS recommended**)
+- **npm** v10.x.x
 
----
+## Key Features
+- Modular architecture for Inventory Management, Procurement, Sales, and Accounting.
+- Dynamic Role & Permission-based access control.
+- Real-time Inventory Adjustments & Transfers.
+- Comprehensive Reports & Analytics.
+- Fully Responsive UI built with TailwindCSS.
+- Fast & efficient with Vite’s blazing dev server.
 
 
 ## Installation
-
 ### 1. Install Dependencies:
 ```bash
 npm install
 # or
 yarn install
 ```
-
 > **Tip:** If you face dependency resolution issues, try:
 >
 > ```bash
@@ -34,118 +36,108 @@ yarn dev
 
 
 ## Contribution Guidelines
-
 To maintain code quality and consistency, please adhere to the following guidelines when contributing to the project.
 
 ### General Principles
-- **Keep it DRY:** Don't repeat yourself. Utilize existing services, actions, and helpers where possible.
+- **Keep it DRY:** Don't repeat yourself. Utilize existing services, components, and helpers where possible.
 - **Permissions over Roles:** Whenever checking for authorization, prefer using specific permissions, hasPermissions("update-customer"). This makes the system more flexible.
 
-### Git Workflow
-1.  **Create a Feature/Bug/Enhancement Branch:** All new work should be done on a feature/bug branch as required.
-    ```bash
-    # Example:
-    git checkout -b feature/user-export-endpoint
-    git checkout -b bug/invalid-status-code
-    git checkout -b enhancement/improve-export-performance
-    ```
-2.  **Write Clear Commit Messages:** Write a concise, imperative-style subject line (e.g., "Add user export functionality"). Add more details in the body if necessary.
-3.  **Submit a Merge Request:** Once your feature is complete and tested, push your branch and create a Merge Request against the `staging` branch.
+### Git Workflow & Commit Guidelines
+Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for clear commit history.
+
+#### Commit Types Examples:
+| Type       | Example Commit Message                                   |
+|------------|----------------------------------------------------------|
+| feat       | feat(user): add user export API endpoint                  |
+| fix        | fix(order): correct invalid status code on approval       |
+| docs       | docs(contributing): add guidelines for new contributors   |
+| style      | style: apply Pint fixes to inventory module               |
+| refactor   | refactor(batch): optimize FIFO stock retrieval logic      |
+| perf       | perf(sale): improve sale item lookup performance          |
+| test       | test(item): add unit tests for stockOnHand calculation    |
+| build      | build: update npm dependencies                           |
+| ci         | ci(github): add CI workflow for PR validation            |
+| chore      | chore: clean up unused services                          |
+| revert     | revert: revert 'feat(user): add user export API endpoint' |
+
+#### Branch Naming Conventions
+```bash
+git checkout -b feature/user-export-endpoint
+git checkout -b bug/fix-status-code
+git checkout -b enhancement/optimize-export-performance
+```
 
 ### Coding Standards
-- **Run ESLint before pushing:**
+- Run **ESLint** before pushing code:
     ```bash
     npm run lint
     ```
-
----
-
-## Notes
-- **Environment Variables:** Make sure to copy `.env.example` to `.env` and configure as needed.
-- All API endpoints and configurations should be managed through environment variables.
-- For UI consistency, follow the design patterns defined in `/components` and `/layouts`.
-
+- Maintain UI consistency by following patterns defined in `/components` and `/layouts`.
 ---
 
 
+## 🗂️ Recommended Sidebar Structure
 
-🔷 Recommended Sidebar Structure
-1. Dashboard
-
+### 1. Dashboard
 🔔 Alerts / Notifications
 
-2. Inventory Management
-📦 Items
+### 2. Inventory Management
+- 📦 Items
+- 🗂️ Categories
+- 🏷️ Units of Measurement
+- 🏪 Warehouses
+- 🔄 Inventory Transfers
+- ✏️ Inventory Adjustments
 
-🗂️ Categories
+### 3. Procurement
+- 📥 Purchase Orders
+- ✅ Goods Received Notes (GRNs)
+- 🧾 Purchase Invoices
+- 💳 Debit Notes
+- 👨‍💼 Vendors
 
-🏷️ Units of Measurement
+### 4. Sales
+- 🛒 Sales Orders
+- 📤 Delivery Notes
+- 📄 Sales Invoices
+- 💸 Credit Notes
+- 👩‍💼 Customers
 
-🏪 Warehouses
+### 5. Accounting
+- 📚 Chart of Accounts
+- 💰 Journal Entries
+- 💹 Taxes
+    - Tax Rates
+    - Tax Groups
+    - Item Tax Mapping
+- 💱 Currency Management
+- 🏢 Cost Centers
 
-🔄 Inventory Transfers
+### 6. Reports 📑
+- Inventory Reports
+- Purchase Reports
+- Sales Reports
+- Tax Reports
+- Profit & Loss
+- Stock Valuation
+- Customer/Vendor Statements
 
-✏️ Inventory Adjustments
+### 7. Settings ⚙️
+- System Settings
+- User Management
+- Roles & Permissions
+- Company Info
 
-3. Procurement
-📥 Purchase Orders
+---
 
-✅ Goods Received Notes (GRNs)
+## 📄 License
+[MIT](LICENSE)
 
-🧾 Purchase Invoices
+---
 
-💳 Debit Notes
+## 🤝 Contributing
+Feel free to fork, submit PRs, and raise issues. For major changes, please open an issue first to discuss what you'd like to change.
 
-👨‍💼 Vendors
+---
 
-4. Sales
-🛒 Sales Orders
-
-📤 Delivery Notes
-
-📄 Sales Invoices
-
-💸 Credit Notes
-
-👩‍💼 Customers
-
-5. Accounting
-📚 Chart of Accounts
-
-💰 Journal Entries
-
-💹 Taxes
-
-Tax Rates
-
-Tax Groups
-
-Item Tax Mapping
-
-💱 Currency Management
-
-🏢 Cost Centers
-
-6. Reports 📑
-Inventory Reports
-
-Purchase Reports
-
-Sales Reports
-
-Tax Reports
-
-Profit & Loss
-
-Stock Valuation
-
-Customer/Vendor Statements
-
-7. Settings ⚙️
-System Settings
-
-User Management
-
-Roles & Permissions
-
-Company Info
+## ✨ Made with ❤️ by the Inventory Manager Team ✨

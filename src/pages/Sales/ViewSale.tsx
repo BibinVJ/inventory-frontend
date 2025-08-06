@@ -47,7 +47,7 @@ export default function ViewSale() {
   return (
     <>
       <PageMeta
-        title={`Sale #${sale.invoice_number} | Pharmacy Manager`}
+        title={`Sale #${sale.invoice_number}`}
         description="View sale details"
       />
       <PageBreadcrumb

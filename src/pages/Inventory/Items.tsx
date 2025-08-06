@@ -65,7 +65,7 @@ export default function Items() {
   return (
     <>
       <PageMeta
-        title="Items | Pharmacy Manager"
+        title="Items"
         description="List of items"
       />
       <PageBreadcrumb pageTitle="Items" />

@@ -153,7 +153,7 @@ export default function EditRole() {
 
   return (
     <>
-      <PageMeta title="Edit Role | Pharmacy Manager" description="Edit an existing role" />
+      <PageMeta title="Edit Role" description="Edit an existing role" />
       <PageBreadcrumb pageTitle="Edit Role" breadcrumbs={[{ label: 'Roles', path: '/roles' }]} backButton />
       <ComponentCard>
         <form onSubmit={handleSubmit}>

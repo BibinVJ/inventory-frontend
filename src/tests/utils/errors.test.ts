@@ -5,10 +5,13 @@ import { ApiError } from '../../types/Error';
 describe('isApiError', () => {
   it('should return true for a valid ApiError object', () => {
     const error: ApiError = {
+      name: 'ApiError',
+      message: 'An error occurred',
       response: {
         data: {
           message: 'An error occurred',
         },
+        status: 500,
       },
     };
     expect(isApiError(error)).toBe(true);

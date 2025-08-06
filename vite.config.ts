@@ -15,6 +15,16 @@ export default defineConfig({
     }),
   ],
   build: {
-    cssMinify: 'lightningcss'
-  }
+    cssMinify: 'lightningcss',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-fullcalendar': ['@fullcalendar/react', '@fullcalendar/daygrid', '@fullcalendar/timegrid', '@fullcalendar/list', '@fullcalendar/interaction'],
+          'vendor-react-grid-layout': ['react-grid-layout'],
+          'vendor-swiper': ['swiper'],
+        },
+      },
+    },
+  },
 });

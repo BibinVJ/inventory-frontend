@@ -55,7 +55,11 @@ export default function EditSocialLinksModal({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await updateSocialLinks(formData);
+      const social_links = Object.entries(formData)
+        .map(([platform, url]) => ({ platform, url }))
+        .filter((link) => link.url);
+
+      const response = await updateSocialLinks({ social_links });
       toast.success(response.message);
       fetchProfile();
       onClose();

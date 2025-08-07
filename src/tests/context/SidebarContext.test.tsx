@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { SidebarProvider } from '../../context/SidebarContext.tsx';
 import { useSidebar } from '../../hooks/useSidebar';

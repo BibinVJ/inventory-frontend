@@ -58,7 +58,7 @@ export default function AddPurchase() {
       setVendors(vendorResponse.data || vendorResponse);
       setItems(itemResponse.data || itemResponse);
       if (invoiceResponse) {
-        setInvoiceNumber(invoiceResponse.invoice_number);
+        setInvoiceNumber(invoiceResponse.data.invoice_number);
       }
     } catch (error) {
       console.error('Error fetching initial data:', error);
@@ -156,7 +156,7 @@ export default function AddPurchase() {
   return (
     <>
       <PageMeta
-        title="Add Purchase | Pharmacy Manager"
+        title="Add Purchase"
         description="Add a new purchase"
       />
       <PageBreadcrumb pageTitle="Add Purchase" breadcrumbs={[{ label: 'Purchases', path: '/purchases' }]} backButton={true}/>

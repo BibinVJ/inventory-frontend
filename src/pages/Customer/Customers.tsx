@@ -31,11 +31,11 @@ export default function Customers() {
     try {
       const response = await getCustomers(page, limit, sortCol, sortDir);
       setCustomers(response.data);
-      setTotalPages(response.last_page);
-      setCurrentPage(response.current_page);
-      setFrom(response.from);
-      setTo(response.to);
-      setTotal(response.total);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching customers:', error);
     }
@@ -66,7 +66,7 @@ export default function Customers() {
   return (
     <>
       <PageMeta
-        title="Customers | Pharmacy Manager"
+        title="Customers"
         description="List of customers"
       />
       <PageBreadcrumb pageTitle="Customers" />

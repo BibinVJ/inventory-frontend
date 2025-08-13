@@ -14,7 +14,7 @@ export interface AuthContextType {
 }
 
 export interface LoginResponse {
-  results: {
+  data: {
     user: User;
     token: {
       access_token: string;

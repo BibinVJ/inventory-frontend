@@ -62,7 +62,7 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
 
     try {
       const response = await addCustomer({ name, email, phone, address, is_active: isActive });
-      onCustomerAdded(response.results);
+      onCustomerAdded(response.data);
       toast.success('Customer added successfully');
       handleClose();
     } catch (error: unknown) {

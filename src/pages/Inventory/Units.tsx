@@ -29,13 +29,13 @@ export default function Units() {
 
   const fetchUnits = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getUnits(page, limit, sortCol, sortDir);
-      setUnits(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getUnits(page, limit, sortCol, sortDir);
+      setUnits(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching units:', error);
     }
@@ -66,7 +66,7 @@ export default function Units() {
   return (
     <>
       <PageMeta
-        title="Units | Pharmacy Manager"
+        title="Units"
         description="List of units"
       />
       <PageBreadcrumb pageTitle="Units" />

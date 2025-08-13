@@ -1,10 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./Dashboard.css";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
 import PageMeta from "../../components/common/PageMeta";
 import { getDashboardData } from "../../services/DashboardService";
 import TopItems from "../../components/ecommerce/TopItems";
@@ -22,10 +20,14 @@ import {
   GroupIcon,
   PageIcon,
 } from "../../icons";
+import { usePermissions } from "../../hooks/usePermissions";
 import { Layout } from "../../types/Layout";
 import { DashboardData } from "../../types/Dashboard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
+const MonthlySalesChart = lazy(() => import("../../components/ecommerce/MonthlySalesChart"));
+const StatisticsChart = lazy(() => import("../../components/ecommerce/StatisticsChart"));
 
 const componentMap = {
     MetricCard,
@@ -61,6 +63,7 @@ const iconMap = {
 };
 
 function Home() {
+  const { hasPermission } = usePermissions();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<{ sales: { date: string; total: number }[]; purchases: { date: string; total: number }[] } | null>(null);
@@ -96,7 +99,7 @@ function Home() {
     const fetchInitialData = async () => {
       try {
         const dashboardRes = await getDashboardData();
-        const results = dashboardRes.data.results;
+        const results = dashboardRes.data.data;
         setData(results);
 
         const transformedChartData = {
@@ -203,6 +206,10 @@ function Home() {
     );
   };
 
+  if (!hasPermission("view-dashboard")) {
+    return <div>This is dashboard</div>;
+  }
+
   if (loading) {
     const skeletonLayouts = {
       lg: initialCards.map(({ i, x, y, w, h, minW, minH }) => ({ i, x, y, w, h, minW, minH })),
@@ -236,8 +243,8 @@ function Home() {
   return (
     <>
       <PageMeta
-        title="Ecommerce Dashboard | Pharmacy Manager"
-        description="This is the ecommerce dashboard page for Pharmacy Manager"
+        title="Ecommerce Dashboard"
+        description="Ecommerce dashboard page"
       />
       <div>
         <div className="flex justify-end gap-2 mb-4">
@@ -257,35 +264,54 @@ function Home() {
           )}
         </div>
         {!loading && cards.length > 0 && (
-          <ResponsiveGridLayout
-            className="layout"
-            layouts={layouts}
-            breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-            cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
-            rowHeight={25}
-            onLayoutChange={onLayoutChange}
-            isDraggable={editMode}
-            isResizable={editMode}
-            draggableCancel=".cancel-drag"
-          >
-            {cardsToRender.map(card => {
-              const Component = componentMap[card.component as keyof typeof componentMap];
-              const resolvedProps = getComponentProps(card.props as { [key: string]: string | number | object });
-              return (
-                <div key={card.i} className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}>
-                  {Component ? <Component {...resolvedProps as any} /> : null}
-                  {editMode && (
-                    <button
-                      className="absolute top-4 right-4 z-10 p-1 bg-gray-200 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 cancel-drag"
-                      onClick={() => handleToggleVisibility(card.i)}
-                    >
-                      {card.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-                    </button>
-                  )}
+          <Suspense fallback={<div className="p-4 space-y-6 md:p-6 2-xl:p-10">
+            <ResponsiveGridLayout
+              className="layout"
+              layouts={{ lg: initialCards.map(({ i, x, y, w, h, minW, minH }) => ({ i, x, y, w, h, minW, minH })) }}
+              breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+              cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
+              rowHeight={25}
+              isDraggable={false}
+              isResizable={false}
+            >
+              {initialCards.map(card => (
+                <div key={card.i}>
+                  <SkeletonCard />
                 </div>
-              );
-            })}
-          </ResponsiveGridLayout>
+              ))}
+            </ResponsiveGridLayout>
+          </div>}>
+            <ResponsiveGridLayout
+              className="layout"
+              layouts={layouts}
+              breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+              cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
+              rowHeight={25}
+              onLayoutChange={onLayoutChange}
+              isDraggable={editMode}
+              isResizable={editMode}
+              draggableCancel=".cancel-drag"
+            >
+              {cardsToRender.map(card => {
+                const Component = componentMap[card.component as keyof typeof componentMap];
+                const resolvedProps = getComponentProps(card.props as { [key:string]: string | number | object });
+                return (
+                  <div key={card.i} className={`dashboard-card-wrapper ${!card.visible && editMode ? 'opacity-50' : ''}`}>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {Component ? <Component {...resolvedProps as any} /> : null}
+                    {editMode && (
+                      <button
+                        className="absolute top-4 right-4 z-10 p-1 bg-gray-200 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 cancel-drag"
+                        onClick={() => handleToggleVisibility(card.i)}
+                      >
+                        {card.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </ResponsiveGridLayout>
+          </Suspense>
         )}
       </div>
     </>

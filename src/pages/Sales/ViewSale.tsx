@@ -23,7 +23,7 @@ export default function ViewSale() {
       try {
         if (id) {
           const response = await getSale(id);
-          setSale(response);
+          setSale(response.data);
         }
       } catch (error) {
         console.error('Error fetching sale details:', error);
@@ -47,7 +47,7 @@ export default function ViewSale() {
   return (
     <>
       <PageMeta
-        title={`Sale #${sale.invoice_number} | Pharmacy Manager`}
+        title={`Sale #${sale.invoice_number}`}
         description="View sale details"
       />
       <PageBreadcrumb

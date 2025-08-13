@@ -26,13 +26,13 @@ export default function Categories() {
 
   const fetchCategories = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getCategories(page, limit, sortCol, sortDir);
-      setCategories(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getCategories(page, limit, sortCol, sortDir);
+      setCategories(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -63,7 +63,7 @@ export default function Categories() {
   return (
     <>
       <PageMeta
-        title="Categories | Pharmacy Manager"
+        title="Categories"
         description="List of categories"
       />
       <PageBreadcrumb pageTitle="Categories" />

@@ -24,7 +24,7 @@ interface SaleItem {
   quantity: number;
   unit_price: number;
   description: string;
-  available_stock: number;
+  stock_on_hand: number;
 }
 
 interface ApiError {
@@ -52,7 +52,7 @@ export default function EditSale() {
       setCustomers(customerResponse.data || customerResponse);
       setItems(itemResponse.data || itemResponse);
 
-      const { customer, invoice_number, sale_date, items } = saleResponse;
+      const { customer, invoice_number, sale_date, items } = saleResponse.data;
       setCustomerId(String(customer.id));
       setInvoiceNumber(invoice_number);
       setSaleDate(sale_date);
@@ -65,12 +65,9 @@ export default function EditSale() {
           quantity: item.quantity,
           unit_price: item.unit_price,
           description: itemDetails.description,
-          // @ts-expect-error: response type is not defined
-          available_stock: itemDetails.is_expired_sale_enabled
-            // @ts-expect-error: response type is not defined
+          stock_on_hand: (itemDetails.is_expired_sale_enabled
             ? itemDetails.stock_on_hand
-            // @ts-expect-error: response type is not defined
-            : itemDetails.non_expired_stock,
+            : itemDetails.non_expired_stock) || 0,
         };
       });
 
@@ -87,7 +84,7 @@ export default function EditSale() {
   }, [fetchInitialData]);
 
   const handleAddItem = () => {
-    setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', available_stock: 0 }]);
+    setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 }]);
   };
 
   const handleItemChange = async (index: number, field: keyof SaleItem, value: string | number) => {
@@ -98,16 +95,13 @@ export default function EditSale() {
       try {
         const itemDetails = await getItem(String(value));
         newItems[index].description = itemDetails.description;
-        // @ts-expect-error: response type is not defined
-        newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-          // @ts-expect-error: response type is not defined
+        newItems[index].stock_on_hand = (itemDetails.is_expired_sale_enabled
           ? itemDetails.stock_on_hand
-          // @ts-expect-error: response type is not defined
-          : itemDetails.non_expired_stock;
+          : itemDetails.non_expired_stock) || 0;
       } catch (error) {
         console.error('Error fetching item details:', error);
         newItems[index].description = '';
-        newItems[index].available_stock = 0;
+        newItems[index].stock_on_hand = 0;
       }
     }
 
@@ -131,7 +125,7 @@ export default function EditSale() {
     saleItems.forEach((item, index) => {
       if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
       if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      if (item.quantity > item.available_stock) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
+      if (item.quantity > item.stock_on_hand) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.stock_on_hand}.`];
       if (item.unit_price < 0) newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
     });
 
@@ -184,7 +178,7 @@ export default function EditSale() {
   return (
     <>
       <PageMeta
-        title="Edit Sale | Pharmacy Manager"
+        title="Edit Sale"
         description="Edit an existing sale"
       />
       <PageBreadcrumb pageTitle="Edit Sale" breadcrumbs={[{ label: 'Sales', path: '/sales' }]} backButton={true} />
@@ -271,11 +265,11 @@ export default function EditSale() {
                     )}
                   </div>
                   {item.item_id && (
-                    <p className={`text-sm mt-1 ${item.available_stock === 0 ? 'text-red-500' :
-                        item.available_stock < 10 ? 'text-orange-500' :
+                    <p className={`text-sm mt-1 ${item.stock_on_hand === 0 ? 'text-red-500' :
+                        item.stock_on_hand < 10 ? 'text-orange-500' :
                         'text-gray-500'
                       }`}>
-                      Available: {item.available_stock}
+                      Available: {item.stock_on_hand}
                     </p>
                   )}
                 </div>

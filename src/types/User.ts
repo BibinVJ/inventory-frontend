@@ -42,11 +42,13 @@ export interface User {
 
 export interface UserApiResponse {
   data: User[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
+  meta: {
+    total: number;
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+  };
 }
 
 export type UserUpdatePayload = Partial<

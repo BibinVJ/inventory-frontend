@@ -26,13 +26,13 @@ export default function Users() {
 
   const fetchUsers = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getUsers(page, limit, sortCol, sortDir);
-      setUsers(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getUsers(page, limit, sortCol, sortDir);
+      setUsers(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -63,7 +63,7 @@ export default function Users() {
   return (
     <>
       <PageMeta
-        title="Users | Pharmacy Manager"
+        title="Users"
         description="List of users"
       />
       <PageBreadcrumb pageTitle="Users" />

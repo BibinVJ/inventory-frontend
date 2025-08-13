@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await api.get("/profile");
-      setUser(data.results);
+      setUser(data.data);
     } catch (error) {
       console.error("Failed to fetch profile", error);
     }
@@ -25,11 +25,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const storedUser = getUser();
-    if (storedUser && storedUser.results.token.access_token) {
+    if (storedUser && storedUser.data.token.access_token) {
       api.defaults.headers.common[
         "Authorization"
-      ] = `Bearer ${storedUser.results.token.access_token}`;
-      setUser(storedUser.results.user);
+      ] = `Bearer ${storedUser.data.token.access_token}`;
+      setUser(storedUser.data.user);
       fetchProfile();
     }
     setLoading(false);
@@ -41,9 +41,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       storeUser(data, stayLoggedIn);
       api.defaults.headers.common[
         "Authorization"
-      ] = `Bearer ${data.results.token.access_token}`;
-      setUser(data.results.user);
-      return data.results.user;
+      ] = `Bearer ${data.data.token.access_token}`;
+      setUser(data.data.user);
+      return data.data.user;
     },
     []
   );

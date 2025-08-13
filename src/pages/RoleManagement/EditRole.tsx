@@ -9,7 +9,6 @@ import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
-import Switch from '../../components/form/switch/Switch';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import Checkbox from '../../components/form/input/Checkbox';
 import Button from '../../components/ui/button/Button';
@@ -24,7 +23,6 @@ export default function EditRole() {
   const [role, setRole] = useState<Role | null>(null);
   const [name, setName] = useState('');
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [isActive, setIsActive] = useState(true);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [errors, setErrors] = useState({ name: '', permissions: '' });
   const navigate = useNavigate();
@@ -38,9 +36,8 @@ export default function EditRole() {
         ]);
         setRole(roleData);
         setName(roleData.name);
-        setSelectedPermissions(roleData.permissions.map(p => p.id));
-        setIsActive(roleData.is_active);
-        setAvailablePermissions(perms);
+        setSelectedPermissions(roleData.permissions.map((p: Permission) => p.id));
+        setAvailablePermissions(perms.data);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to fetch role or permissions');
@@ -126,7 +123,7 @@ export default function EditRole() {
     e.preventDefault();
     // Validation logic...
     try {
-      await updateRole(role!.id, { name, permissions: selectedPermissions, is_active: isActive });
+      await updateRole(role!.id, { name, permissions: selectedPermissions});
       toast.success('Role updated successfully');
       navigate('/roles');
     } catch (error: unknown) {
@@ -153,7 +150,7 @@ export default function EditRole() {
 
   return (
     <>
-      <PageMeta title="Edit Role | Pharmacy Manager" description="Edit an existing role" />
+      <PageMeta title="Edit Role" description="Edit an existing role" />
       <PageBreadcrumb pageTitle="Edit Role" breadcrumbs={[{ label: 'Roles', path: '/roles' }]} backButton />
       <ComponentCard>
         <form onSubmit={handleSubmit}>
@@ -162,10 +159,6 @@ export default function EditRole() {
               <div>
                 <Label>Name <span className="text-red-500">*</span></Label>
                 <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
               </div>
             </div>
             <div>

@@ -23,7 +23,7 @@ export default function ViewPurchase() {
       try {
         if (id) {
           const response = await getPurchase(id);
-          setPurchase(response);
+          setPurchase(response.data);
         }
       } catch (error) {
         console.error('Error fetching purchase details:', error);
@@ -47,7 +47,7 @@ export default function ViewPurchase() {
   return (
     <>
       <PageMeta
-        title={`Purchase #${purchase.invoice_number} | Pharmacy Manager`}
+        title={`Purchase #${purchase.invoice_number}`}
         description="View purchase details"
       />
       <PageBreadcrumb

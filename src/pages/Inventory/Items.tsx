@@ -28,13 +28,13 @@ export default function Items() {
 
   const fetchItems = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getItems(page, limit, sortCol, sortDir);
-      setItems(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getItems(page, limit, sortCol, sortDir);
+      setItems(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
@@ -65,7 +65,7 @@ export default function Items() {
   return (
     <>
       <PageMeta
-        title="Items | Pharmacy Manager"
+        title="Items"
         description="List of items"
       />
       <PageBreadcrumb pageTitle="Items" />

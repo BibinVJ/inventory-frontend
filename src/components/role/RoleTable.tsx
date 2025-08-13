@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { useState } from "react";
-import Badge from "../ui/badge/Badge";
 import DeleteRoleModal from "./DeleteRoleModal";
 import { ChevronsUpDown, ArrowUpWideNarrow, ArrowDownNarrowWide } from 'lucide-react';
 import Button from "../ui/button/Button";
@@ -68,7 +67,6 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
             <TableRow>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('name')}>Name {renderSortIcon('name')}</TableCell>
-              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -82,11 +80,6 @@ export default function RoleTable({ data, onAction, onSort, sortBy, sortDirectio
                   </p>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{formatKebabCase(role.name)}</TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={role.is_active ? "success" : "error"}>
-                    {role.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {role.name !== "admin" && (
                     <div className="flex items-center gap-2">

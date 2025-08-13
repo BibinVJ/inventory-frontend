@@ -27,13 +27,13 @@ export default function Sales() {
 
   const fetchSales = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getSales(page, limit, sortCol, sortDir);
-      setSales(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getSales(page, limit, sortCol, sortDir);
+      setSales(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching sales:', error);
     }
@@ -64,7 +64,7 @@ export default function Sales() {
   return (
     <>
       <PageMeta
-        title="Sales | Pharmacy Manager"
+        title="Sales"
         description="List of sales"
       />
       <PageBreadcrumb pageTitle="Sales" />

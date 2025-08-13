@@ -27,11 +27,11 @@ export default function Roles() {
     try {
       const response = await getRoles(page, limit, sortCol, sortDir);
       setRoles(response.data);
-      setTotalPages(response.last_page);
-      setCurrentPage(response.current_page);
-      setFrom(response.from);
-      setTo(response.to);
-      setTotal(response.total);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching roles:', error);
     }
@@ -62,7 +62,7 @@ export default function Roles() {
   return (
     <>
       <PageMeta
-        title="Roles | Pharmacy Manager"
+        title="Roles"
         description="List of roles"
       />
       <PageBreadcrumb pageTitle="Roles" />

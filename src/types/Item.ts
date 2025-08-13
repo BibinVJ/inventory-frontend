@@ -10,15 +10,21 @@ export interface Item {
   unit: Unit;
   type: string;
   is_active: boolean;
+  stock_on_hand?: number;
+  non_expired_stock?: number;
+  expired_stock?: number;
+  is_expired_sale_enabled?: boolean;
 }
 
 export interface ItemApiResponse {
   data: Item[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
+  meta: {
+    total: number;
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+  };
 }
 
 export interface StockAlert {

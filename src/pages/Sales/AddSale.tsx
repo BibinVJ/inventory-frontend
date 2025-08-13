@@ -27,7 +27,7 @@ interface SaleItem {
   quantity: number;
   unit_price: number;
   description: string;
-  available_stock: number;
+  stock_on_hand: number;
 }
 
 interface ApiError {
@@ -42,7 +42,7 @@ export default function AddSale() {
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [saleDate, setSaleDate] = useState(formatDate(new Date()));
   const [saleItems, setSaleItems] = useState<SaleItem[]>([
-    { item_id: '', quantity: 1, unit_price: 0, description: '', available_stock: 0 }
+    { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 }
   ]);
   const [errors, setErrors] = useState<ApiError>({});
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ export default function AddSale() {
       setCustomers(customerResponse.data || customerResponse);
       setItems(itemResponse.data || itemResponse);
       if (invoiceResponse) {
-        setInvoiceNumber(invoiceResponse.invoice_number);
+        setInvoiceNumber(invoiceResponse.data.invoice_number);
       }
     } catch (error) {
       console.error('Error fetching initial data:', error);
@@ -69,7 +69,7 @@ export default function AddSale() {
   };
 
   const handleAddItem = () => {
-    setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', available_stock: 0 }]);
+    setSaleItems([...saleItems, { item_id: '', quantity: 1, unit_price: 0, description: '', stock_on_hand: 0 }]);
   };
 
   const handleItemChange = async (index: number, field: keyof SaleItem, value: string | number) => {
@@ -79,15 +79,12 @@ export default function AddSale() {
     if (field === 'item_id' && value) {
       try {
         const itemDetails = await getItem(String(value));
-        // @ts-expect-error: response type is not defined
-        newItems[index].available_stock = itemDetails.is_expired_sale_enabled
-          // @ts-expect-error: response type is not defined
+        newItems[index].stock_on_hand = (itemDetails.is_expired_sale_enabled
           ? itemDetails.stock_on_hand
-          // @ts-expect-error: response type is not defined
-          : itemDetails.non_expired_stock;
+          : itemDetails.non_expired_stock) || 0;
       } catch (error) {
         console.error('Error fetching item details:', error);
-        newItems[index].available_stock = 0;
+        newItems[index].stock_on_hand = 0;
       }
     }
 
@@ -111,7 +108,7 @@ export default function AddSale() {
     saleItems.forEach((item, index) => {
       if (!item.item_id) newErrors[`items.${index}.item_id`] = ['Item is required.'];
       if (item.quantity <= 0) newErrors[`items.${index}.quantity`] = ['Quantity must be greater than 0.'];
-      if (item.quantity > item.available_stock) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.available_stock}.`];
+      if (item.quantity > item.stock_on_hand) newErrors[`items.${index}.quantity`] = [`Quantity cannot exceed available stock of ${item.stock_on_hand}.`];
       if (item.unit_price < 0) newErrors[`items.${index}.unit_price`] = ['Unit price cannot be negative.'];
     });
 
@@ -167,7 +164,7 @@ export default function AddSale() {
   return (
     <>
       <PageMeta
-        title="Add Sale | Pharmacy Manager"
+        title="Add Sale"
         description="Add a new sale"
       />
       <PageBreadcrumb pageTitle="Add Sale" breadcrumbs={[{ label: 'Sales', path: '/sales' }]} backButton={true}/>
@@ -261,11 +258,11 @@ export default function AddSale() {
                   </div>
                    {item.item_id && (
                     <p className={`text-sm mt-1 ${
-                        item.available_stock === 0 ? 'text-red-500' :
-                        item.available_stock < 10 ? 'text-orange-500' :
+                        item.stock_on_hand === 0 ? 'text-red-500' :
+                        item.stock_on_hand < 10 ? 'text-orange-500' :
                         'text-gray-500'
                     }`}>
-                        Available: {item.available_stock}
+                        Available: {item.stock_on_hand}
                     </p>
                   )}
                 </div>

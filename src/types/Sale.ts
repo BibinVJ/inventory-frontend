@@ -22,11 +22,13 @@ export interface Sale {
 
 export interface SaleApiResponse {
   data: Sale[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
+  meta: {
+    total: number;
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+  };
 }
 
 export interface SalePayload {

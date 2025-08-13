@@ -23,7 +23,7 @@ export default function ViewSale() {
       try {
         if (id) {
           const response = await getSale(id);
-          setSale(response);
+          setSale(response.data);
         }
       } catch (error) {
         console.error('Error fetching sale details:', error);

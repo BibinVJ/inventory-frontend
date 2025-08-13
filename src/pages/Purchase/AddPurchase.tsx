@@ -58,7 +58,7 @@ export default function AddPurchase() {
       setVendors(vendorResponse.data || vendorResponse);
       setItems(itemResponse.data || itemResponse);
       if (invoiceResponse) {
-        setInvoiceNumber(invoiceResponse.invoice_number);
+        setInvoiceNumber(invoiceResponse.data.invoice_number);
       }
     } catch (error) {
       console.error('Error fetching initial data:', error);

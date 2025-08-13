@@ -54,7 +54,7 @@ export default function EditPurchase() {
         setVendors(vendorResponse.data || vendorResponse);
         setItems(itemResponse.data || itemResponse);
 
-        const { vendor, invoice_number, purchase_date, items } = purchaseResponse;
+        const { vendor, invoice_number, purchase_date, items } = purchaseResponse.data;
         setVendorId(String(vendor.id));
         setInvoiceNumber(invoice_number);
         setPurchaseDate(purchase_date);

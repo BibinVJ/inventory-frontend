@@ -24,43 +24,43 @@ describe('ItemService', () => {
   });
 
   it('should fetch items', async () => {
-    const response = { results: [mockItem] };
+    const response = { data: [mockItem] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getItems();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/item?perPage=10&page=1&sort_by=created_at&sort_direction=desc');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should fetch a single item', async () => {
-    const response = { results: mockItem };
+    const response = { data: mockItem };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getItem('1');
 
     expect(mockedApi.get).toHaveBeenCalledWith('/item/1');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response.data);
   });
 
   it('should add an item', async () => {
     const newItem = { sku: 'NEW-001', name: 'New Item', category_id: '2', unit_id: '2', description: 'New Description', is_active: true, type: 'service' };
-    mockedApi.post.mockResolvedValue({ data: { results: newItem } });
+    mockedApi.post.mockResolvedValue({ data: newItem });
 
     const result = await addItem(newItem);
 
     expect(mockedApi.post).toHaveBeenCalledWith('/item', newItem);
-    expect(result).toEqual({ results: newItem });
+    expect(result).toEqual(newItem);
   });
 
   it('should update an item', async () => {
     const updatedItem = { sku: 'UPD-001', name: 'Updated Item', category_id: '3', unit_id: '3', description: 'Updated Description', is_active: false, type: 'product' };
-    mockedApi.put.mockResolvedValue({ data: { results: updatedItem } });
+    mockedApi.put.mockResolvedValue({ data: updatedItem });
 
     const result = await updateItem(1, updatedItem);
 
     expect(mockedApi.put).toHaveBeenCalledWith('/item/1', updatedItem);
-    expect(result).toEqual({ results: updatedItem });
+    expect(result).toEqual(updatedItem);
   });
 
   it('should delete an item', async () => {

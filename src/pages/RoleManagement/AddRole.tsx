@@ -9,7 +9,6 @@ import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import ComponentCard from '../../components/common/ComponentCard';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
-import Switch from '../../components/form/switch/Switch';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table';
 import Checkbox from '../../components/form/input/Checkbox';
 import Button from '../../components/ui/button/Button';
@@ -20,7 +19,6 @@ import { isApiError } from '../../utils/errors';
 export default function AddRole() {
   const [name, setName] = useState('');
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [isActive, setIsActive] = useState(true);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [errors, setErrors] = useState({ name: '', permissions: '' });
   const navigate = useNavigate();
@@ -29,7 +27,7 @@ export default function AddRole() {
     const fetchPermissions = async () => {
       try {
         const perms = await getPermissions();
-        setAvailablePermissions(perms);
+        setAvailablePermissions(perms.data);
       } catch (error) {
         console.error('Error fetching permissions:', error);
         toast.error('Failed to fetch permissions');
@@ -114,7 +112,7 @@ export default function AddRole() {
     e.preventDefault();
     // Validation logic...
     try {
-      await createRole({ name, permissions: selectedPermissions, is_active: isActive });
+      await createRole({ name, permissions: selectedPermissions });
       toast.success('Role added successfully');
       navigate('/roles');
     } catch (error: unknown) {
@@ -146,10 +144,6 @@ export default function AddRole() {
               <div>
                 <Label>Name <span className="text-red-500">*</span></Label>
                 <Input type="text" value={name} onChange={handleNameChange} error={!!errors.name} hint={errors.name} />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Switch label={isActive ? 'Active' : 'Inactive'} checked={isActive} onChange={setIsActive} />
               </div>
             </div>
 

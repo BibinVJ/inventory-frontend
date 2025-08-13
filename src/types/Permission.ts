@@ -5,9 +5,11 @@ export interface Permission {
 
 export interface PermissionApiResponse {
   data: Permission[];
-  last_page: number;
-  current_page: number;
-  from: number;
-  to: number;
-  total: number;
+  meta: {
+    total: number;
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+  };
 }

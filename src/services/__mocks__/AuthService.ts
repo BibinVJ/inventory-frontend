@@ -9,7 +9,7 @@ const mockUser: User = {
 };
 
 export const login = vi.fn().mockResolvedValue({
-  results: {
+  data: {
     user: mockUser,
     token: {
       access_token: 'test_token',
@@ -20,7 +20,7 @@ export const login = vi.fn().mockResolvedValue({
 export const logout = vi.fn().mockResolvedValue(undefined);
 
 export const getUser = vi.fn().mockReturnValue({
-  results: {
+  data: {
     user: mockUser,
     token: {
       access_token: 'test_token',

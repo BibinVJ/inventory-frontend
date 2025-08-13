@@ -20,6 +20,7 @@ import {
   GroupIcon,
   PageIcon,
 } from "../../icons";
+import { usePermissions } from "../../hooks/usePermissions";
 import { Layout } from "../../types/Layout";
 import { DashboardData } from "../../types/Dashboard";
 
@@ -62,6 +63,7 @@ const iconMap = {
 };
 
 function Home() {
+  const { hasPermission } = usePermissions();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<{ sales: { date: string; total: number }[]; purchases: { date: string; total: number }[] } | null>(null);
@@ -97,7 +99,7 @@ function Home() {
     const fetchInitialData = async () => {
       try {
         const dashboardRes = await getDashboardData();
-        const results = dashboardRes.data.results;
+        const results = dashboardRes.data.data;
         setData(results);
 
         const transformedChartData = {
@@ -203,6 +205,10 @@ function Home() {
       )
     );
   };
+
+  if (!hasPermission("view-dashboard")) {
+    return <div>This is dashboard</div>;
+  }
 
   if (loading) {
     const skeletonLayouts = {

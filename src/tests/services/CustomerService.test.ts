@@ -22,33 +22,33 @@ describe('CustomerService', () => {
   });
 
   it('should fetch customers', async () => {
-    const response = { results: [mockCustomer] };
+    const response = { data: [mockCustomer] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getCustomers();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/customer?perPage=10&page=1&sort_by=created_at&sort_direction=desc');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should add a customer', async () => {
     const newCustomer = { name: 'New Customer', email: 'new@example.com', phone: '0987654321', address: 'New Address', is_active: true };
-    mockedApi.post.mockResolvedValue({ data: { results: newCustomer } });
+    mockedApi.post.mockResolvedValue({ data: newCustomer });
 
     const result = await addCustomer(newCustomer);
 
     expect(mockedApi.post).toHaveBeenCalledWith('/customer', newCustomer);
-    expect(result).toEqual({ results: newCustomer });
+    expect(result).toEqual(newCustomer);
   });
 
   it('should update a customer', async () => {
     const updatedCustomer = { name: 'Updated Customer', email: 'updated@example.com', phone: '1112223333', address: 'Updated Address', is_active: false };
-    mockedApi.put.mockResolvedValue({ data: { results: updatedCustomer } });
+    mockedApi.put.mockResolvedValue({ data: updatedCustomer });
 
     const result = await updateCustomer(1, updatedCustomer);
 
     expect(mockedApi.put).toHaveBeenCalledWith('/customer/1', updatedCustomer);
-    expect(result).toEqual({ results: updatedCustomer });
+    expect(result).toEqual(updatedCustomer);
   });
 
   it('should delete a customer', async () => {

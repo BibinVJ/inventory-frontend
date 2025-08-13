@@ -31,11 +31,16 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
     if (isOpen) {
       const fetchRoles = async () => {
         try {
-          const rolesData = await getRoles(1, 1, 'created_at', 'desc', true);
-          setRoles(rolesData.data);
+          const rolesData = await getRoles(1, 10, 'created_at', 'desc', true);
+          if (rolesData && Array.isArray(rolesData.data)) {
+            setRoles(rolesData.data);
+          } else {
+            setRoles([]);
+          }
         } catch (error) {
           console.error('Error fetching roles:', error);
           toast.error('Failed to fetch roles');
+          setRoles([]);
         }
       };
       fetchRoles();
@@ -136,11 +141,11 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
                 <Label>Name <span className="text-red-500">*</span></Label>
-                <Input type="text" value={name} onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: '' }) }} error={!!errors.name} hint={errors.name} />
+                <Input type="text" value={name} onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: '' }) }} error={!!errors.name} hint={errors.name} autoComplete="off" />
               </div>
               <div>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }) }} error={!!errors.email} hint={errors.email} />
+                <Input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }) }} error={!!errors.email} hint={errors.email} autoComplete="off" />
               </div>
               <div>
                 <Label>Phone</Label>
@@ -148,7 +153,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
               </div>
               <div>
                 <Label>Password <span className="text-red-500">*</span></Label>
-                <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }) }} error={!!errors.password} hint={errors.password} />
+                <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }) }} error={!!errors.password} hint={errors.password} autoComplete="new-password" />
               </div>
               <div>
                 <Label>Role <span className="text-red-500">*</span></Label>

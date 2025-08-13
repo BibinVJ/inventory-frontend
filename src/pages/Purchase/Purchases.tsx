@@ -28,13 +28,13 @@ export default function Purchases() {
 
   const fetchPurchases = async (page = 1, limit = 10, sortCol = 'created_at', sortDir = 'desc') => {
     try {
-      const { data, last_page, current_page, from, to, total } = await getPurchases(page, limit, sortCol, sortDir);
-      setPurchases(data);
-      setTotalPages(last_page);
-      setCurrentPage(current_page);
-      setFrom(from);
-      setTo(to);
-      setTotal(total);
+      const response = await getPurchases(page, limit, sortCol, sortDir);
+      setPurchases(response.data);
+      setTotalPages(response.meta.last_page);
+      setCurrentPage(response.meta.current_page);
+      setFrom(response.meta.from);
+      setTo(response.meta.to);
+      setTotal(response.meta.total);
     } catch (error) {
       console.error('Error fetching purchases:', error);
     }

@@ -73,6 +73,10 @@ git checkout -b enhancement/optimize-export-performance
     ```bash
     npm run lint
     ```
+- Run **Tests** before pushing code:
+    ```bash
+    npm run test -- --run
+    ```
 - Maintain UI consistency by following patterns defined in `/components` and `/layouts`.
 ---
 

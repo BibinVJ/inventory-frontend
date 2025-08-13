@@ -20,33 +20,33 @@ describe('CategoryService', () => {
   });
 
   it('should fetch categories', async () => {
-    const response = { results: [mockCategory] };
+    const response = { data: [mockCategory] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getCategories();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/category?perPage=10&page=1&sort_by=created_at&sort_direction=desc');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should add a category', async () => {
     const newCategory = { name: 'New Category', description: 'New Description', is_active: true };
-    mockedApi.post.mockResolvedValue({ data: { results: newCategory } });
+    mockedApi.post.mockResolvedValue({ data: newCategory });
 
     const result = await addCategory(newCategory);
 
     expect(mockedApi.post).toHaveBeenCalledWith('/category', newCategory);
-    expect(result).toEqual({ results: newCategory });
+    expect(result).toEqual(newCategory);
   });
 
   it('should update a category', async () => {
     const updatedCategory = { name: 'Updated Category', description: 'Updated Description', is_active: false };
-    mockedApi.put.mockResolvedValue({ data: { results: updatedCategory } });
+    mockedApi.put.mockResolvedValue({ data: updatedCategory });
 
     const result = await updateCategory(1, updatedCategory);
 
     expect(mockedApi.put).toHaveBeenCalledWith('/category/1', updatedCategory);
-    expect(result).toEqual({ results: updatedCategory });
+    expect(result).toEqual(updatedCategory);
   });
 
   it('should delete a category', async () => {

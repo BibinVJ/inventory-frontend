@@ -25,7 +25,11 @@ jobs:
 
       - name: Inject .env File
         run: |
-          echo "${{ github.ref == 'refs/heads/main' && secrets.FRONTEND_ENV_MAIN || secrets.FRONTEND_ENV_BETA }}" > .env
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            echo "${{ secrets.FRONTEND_ENV_MAIN }}" > .env
+          else
+            echo "${{ secrets.FRONTEND_ENV_BETA }}" > .env
+          fi
 
       - name: Build Frontend
         run: npm run build
@@ -39,11 +43,12 @@ jobs:
           source: 'dist/*'
           target: ${{ github.ref == 'refs/heads/main' && '/var/www/inventory/production/frontend' || '/var/www/inventory/beta/frontend' }}
 
-      - name: Invalidate Cache (Optional)
+      - name: Post-Deploy Notification
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Frontend deployed to ${{ github.ref_name }}"
+            BRANCH=${GITHUB_REF##*/}
+            echo "Frontend deployed for branch $BRANCH"

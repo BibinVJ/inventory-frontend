@@ -12,12 +12,12 @@ describe('PermissionService', () => {
   });
 
   it('should fetch permissions', async () => {
-    const response = { results: ['read', 'write', 'delete'] };
+    const response = { data: ['read', 'write', 'delete'] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getPermissions();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/permissions');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 });

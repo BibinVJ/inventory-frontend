@@ -23,53 +23,53 @@ describe('SaleService', () => {
   });
 
   it('should fetch sales', async () => {
-    const response = { results: [mockSale] };
+    const response = { data: [mockSale] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getSales();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/sale?perPage=10&page=1&sort_by=created_at&sort_direction=desc');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should fetch a single sale', async () => {
-    const response = { results: mockSale };
+    const response = { data: mockSale };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getSale('1');
 
     expect(mockedApi.get).toHaveBeenCalledWith('/sale/1');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should fetch the next sale invoice number', async () => {
-    const response = { results: 'INV-002' };
+    const response = { invoice_number: 'INV-002' };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getNextInvoiceNumber();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/sale/next-invoice-number');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should add a sale', async () => {
-    const newSale: SalePayload = { customer_id: 2, sale_date: '2024-02-01', items: [] };
-    mockedApi.post.mockResolvedValue({ data: { results: newSale } });
+    const newSale: SalePayload = { customer_id: '2', invoice_number: 'INV-003', sale_date: '2024-02-01', items: [] };
+    mockedApi.post.mockResolvedValue({ data: newSale });
 
     const result = await addSale(newSale);
 
     expect(mockedApi.post).toHaveBeenCalledWith('/sale', newSale);
-    expect(result).toEqual({ results: newSale });
+    expect(result).toEqual(newSale);
   });
 
   it('should update a sale', async () => {
-    const updatedSale: SalePayload = { customer_id: 3, sale_date: '2024-03-01', items: [] };
-    mockedApi.put.mockResolvedValue({ data: { results: updatedSale } });
+    const updatedSale: SalePayload = { customer_id: '3', invoice_number: 'INV-004', sale_date: '2024-03-01', items: [] };
+    mockedApi.put.mockResolvedValue({ data: updatedSale });
 
     const result = await updateSale('1', updatedSale);
 
     expect(mockedApi.put).toHaveBeenCalledWith('/sale/1', updatedSale);
-    expect(result).toEqual({ results: updatedSale });
+    expect(result).toEqual(updatedSale);
   });
 
   it('should void a sale', async () => {

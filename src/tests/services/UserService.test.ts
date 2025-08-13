@@ -20,43 +20,43 @@ describe('UserService', () => {
   });
 
   it('should fetch users', async () => {
-    const response = { results: [mockUser] };
+    const response = { data: [mockUser] };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getUsers();
 
     expect(mockedApi.get).toHaveBeenCalledWith('/user?perPage=10&page=1&sort_by=created_at&sort_direction=desc');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should fetch a single user', async () => {
-    const response = { results: mockUser };
+    const response = { data: mockUser };
     mockedApi.get.mockResolvedValue({ data: response });
 
     const result = await getUser('1');
 
     expect(mockedApi.get).toHaveBeenCalledWith('/user/1');
-    expect(result).toEqual(response.results);
+    expect(result).toEqual(response);
   });
 
   it('should create a user', async () => {
-    const newUser = { name: 'New User', email: 'new@example.com' };
-    mockedApi.post.mockResolvedValue({ data: { results: newUser } });
+    const newUser = { name: 'New User', email: 'new@example.com', phone: '1234567890', role_id: 1 };
+    mockedApi.post.mockResolvedValue({ data: newUser });
 
     const result = await createUser(newUser);
 
     expect(mockedApi.post).toHaveBeenCalledWith('/user', newUser);
-    expect(result).toEqual({ results: newUser });
+    expect(result).toEqual(newUser);
   });
 
   it('should update a user', async () => {
     const updatedUser: UserUpdatePayload = { name: 'Updated User' };
-    mockedApi.put.mockResolvedValue({ data: { results: updatedUser } });
+    mockedApi.put.mockResolvedValue({ data: updatedUser });
 
     const result = await updateUser(1, updatedUser);
 
     expect(mockedApi.put).toHaveBeenCalledWith('/user/1', updatedUser);
-    expect(result).toEqual({ results: updatedUser });
+    expect(result).toEqual(updatedUser);
   });
 
   it('should delete a user', async () => {

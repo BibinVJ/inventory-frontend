@@ -78,11 +78,13 @@ export default function ViewSale() {
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Sale Details</h3>
               <p className="dark:text-gray-400"><strong>Invoice #:</strong> {sale.invoice_number}</p>
               <p className="dark:text-gray-400"><strong>Sale Date:</strong> {sale.sale_date}</p>
+              <p className="dark:text-gray-400"><strong>Entered By:</strong> {sale.user.name}</p>
               <p className="dark:text-gray-400"><strong>Payment Status:</strong>
                 <Badge size="sm" color={sale.payment_status === 'paid' ? 'success' : 'warning'}>
                   {sale.payment_status}
                 </Badge>
               </p>
+              <p className="dark:text-gray-400"><strong>Payment Method:</strong> {sale.payment_method}</p>
             </div>
           </div>
 

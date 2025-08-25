@@ -27,9 +27,10 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [type, setType] = useState('product');
+  const [selling_price, setSellingPrice] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
-  const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '' });
+  const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
 
   useEffect(() => {
     if (isOpen) {
@@ -64,7 +65,8 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
     setDescription('');
     setIsActive(true);
     setType('product');
-    setErrors({ sku: '', name: '', category_id: '', unit_id: '', type: '' });
+    setSellingPrice(0);
+    setErrors({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
   };
 
   const handleClose = () => {
@@ -75,7 +77,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors = { sku: '', name: '', category_id: '', unit_id: '', type: '' };
+    const newErrors = { sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' };
     let hasError = false;
 
     if (!sku) {
@@ -109,6 +111,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
         description,
         is_active: isActive,
         type,
+        selling_price
       });
       onItemAdded();
       toast.success('Item added successfully');
@@ -121,6 +124,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
           name: apiErrors?.name?.[0] || '',
           category_id: apiErrors?.category_id?.[0] || '',
           unit_id: apiErrors?.unit_id?.[0] || '',
+          selling_price: apiErrors?.selling_price?.[0] || '',
           type: apiErrors?.type?.[0] || '',
         };
         setErrors(newErrors);
@@ -175,6 +179,10 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
                   error={!!errors.unit_id}
                   hint={errors.unit_id}
                 />
+              </div>
+              <div>
+                <Label>Selling Price <span className="text-red-500">*</span></Label>
+                <Input type="number" value={selling_price} onChange={(e) => { setSellingPrice(e.target.value); setErrors({ ...errors, selling_price: '' }) }} error={!!errors.selling_price} hint={errors.selling_price} />
               </div>
               <div className="lg:col-span-2">
                 <Label>Description</Label>

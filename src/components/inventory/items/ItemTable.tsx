@@ -74,6 +74,7 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('category_id')}>Category {renderSortIcon('category_id')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('unit_id')}>Unit {renderSortIcon('unit_id')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('type')}>Type {renderSortIcon('type')}</TableCell>
+              <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('selling_price')}>Selling Price {renderSortIcon('selling_price')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 cursor-pointer text-start text-theme-xs dark:text-gray-400" onClick={() => onSort('is_active')}>Status {renderSortIcon('is_active')}</TableCell>
               <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
             </TableRow>
@@ -92,6 +93,7 @@ export default function ItemTable({ data, onAction, onSort, sortBy, sortDirectio
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.category.name}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.unit.name} ({item.unit.code})</TableCell>
                 <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.type}</TableCell>
+                <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-gray-400">{item.selling_price}</TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={item.is_active ? "success" : "error"}>
                     {item.is_active ? "Active" : "Inactive"}

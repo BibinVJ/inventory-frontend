@@ -28,9 +28,10 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [type, setType] = useState('product');
+  const [selling_price, setSellingPrice] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
-  const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '' });
+  const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
 
   useEffect(() => {
     if (item) {
@@ -41,6 +42,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
       setDescription(item.description || '');
       setIsActive(item.is_active);
       setType(item.type);
+      setSellingPrice(String(item.selling_price || ''));
     }
   }, [item]);
 
@@ -72,7 +74,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors = { sku: '', name: '', category_id: '', unit_id: '', type: '' };
+    const newErrors = { sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' };
     let hasError = false;
 
     if (!sku) {
@@ -106,6 +108,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
         description,
         is_active: isActive,
         type,
+        selling_price: Number(selling_price),
       });
       onItemUpdated();
       toast.success('Item updated successfully');
@@ -119,6 +122,7 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
           category_id: apiErrors?.category_id?.[0] || '',
           unit_id: apiErrors?.unit_id?.[0] || '',
           type: apiErrors?.type?.[0] || '',
+          selling_price: apiErrors?.selling_price?.[0] || '',
         };
         setErrors(newErrors);
         toast.error('Please correct the errors in the form');
@@ -172,6 +176,10 @@ export default function EditItemModal({ isOpen, onClose, onItemUpdated, item }: 
                   error={!!errors.unit_id}
                   hint={errors.unit_id}
                 />
+              </div>
+              <div>
+                <Label>Selling Price <span className="text-red-500">*</span></Label>
+                <Input type="number" value={selling_price} onChange={(e) => { setSellingPrice(e.target.value); setErrors({ ...errors, selling_price: '' }) }} error={!!errors.selling_price} hint={errors.selling_price} />
               </div>
               <div className="lg:col-span-2">
                 <Label>Description</Label>

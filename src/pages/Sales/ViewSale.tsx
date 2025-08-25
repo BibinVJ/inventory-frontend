@@ -69,22 +69,22 @@ export default function ViewSale() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Customer Details</h3>
-              <p className="dark:text-gray-400"><strong>Name:</strong> {sale.customer.name}</p>
-              <p className="dark:text-gray-400"><strong>Email:</strong> {sale.customer.email}</p>
-              <p className="dark:text-gray-400"><strong>Phone:</strong> {sale.customer.phone}</p>
-              <p className="dark:text-gray-400"><strong>Address:</strong> {sale.customer.address}</p>
+              <p className="dark:text-gray-400">Name: <strong>{sale.customer.name}</strong></p>
+              <p className="dark:text-gray-400">Email: <strong>{sale.customer.email}</strong></p>
+              <p className="dark:text-gray-400">Phone: <strong>{sale.customer.phone}</strong></p>
+              <p className="dark:text-gray-400">Address: <strong>{sale.customer.address}</strong></p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2 dark:text-gray-400">Sale Details</h3>
-              <p className="dark:text-gray-400"><strong>Invoice #:</strong> {sale.invoice_number}</p>
-              <p className="dark:text-gray-400"><strong>Sale Date:</strong> {sale.sale_date}</p>
-              <p className="dark:text-gray-400"><strong>Entered By:</strong> {sale.user.name}</p>
-              <p className="dark:text-gray-400"><strong>Payment Status:</strong>
-                <Badge size="sm" color={sale.payment_status === 'paid' ? 'success' : 'warning'}>
-                  {sale.payment_status}
+              <p className="dark:text-gray-400">Invoice #: <strong>{sale.invoice_number}</strong></p>
+              <p className="dark:text-gray-400">Sale Date: <strong>{sale.sale_date}</strong></p>
+              <p className="dark:text-gray-400">Entered By: <strong>{sale.user.name}</strong></p>
+              <p className="dark:text-gray-400">Status: <strong>
+                <Badge size="sm" color={sale.status === 'completed' ? 'success' : (sale.status === 'voided' ? 'error' : 'primary')}>
+                  {sale.status}
                 </Badge>
-              </p>
-              <p className="dark:text-gray-400"><strong>Payment Method:</strong> {sale.payment_method}</p>
+              </strong></p>
+              <p className="dark:text-gray-400">Payment Method: <strong>{sale.payment_method}</strong></p>
             </div>
           </div>
 

@@ -72,10 +72,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
       hasError = true;
     }
 
-    if (!email) {
-      newErrors.email = 'Email is required';
-      hasError = true;
-    } else if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
       newErrors.email = 'Please enter a valid email address';
       hasError = true;
     }
@@ -92,7 +89,6 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
       newErrors.role_id = 'Role is required';
       hasError = true;
     }
-
 
     if (hasError) {
       setErrors(newErrors);
@@ -144,7 +140,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }: Props) {
                 <Input type="text" value={name} onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: '' }) }} error={!!errors.name} hint={errors.name} autoComplete="off" />
               </div>
               <div>
-                <Label>Email <span className="text-red-500">*</span></Label>
+                <Label>Email</Label>
                 <Input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }) }} error={!!errors.email} hint={errors.email} autoComplete="off" />
               </div>
               <div>

@@ -11,18 +11,20 @@ import SocialButton from "../ui/button/SocialButton";
 import GoogleIcon from "../../icons/GoogleIcon";
 import XIcon from "../../icons/XIcon";
 import { toast } from "sonner";
-import { isApiError } from '../../utils/errors';
-
+import { isApiError } from "../../utils/errors";
 
 export default function SignInForm() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ identifier: "", password: "" }); // email or mobile
+  const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const isEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,28 +35,33 @@ export default function SignInForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!form.email) {
-      setErrors({ ...errors, email: 'Email is required' });
+    if (!form.identifier) {
+      setErrors({ ...errors, identifier: "Email or mobile is required" });
+      return;
+    }
+
+    // validate only if it looks like an email
+    if (form.identifier.includes("@") && !isEmail(form.identifier)) {
+      setErrors({ ...errors, identifier: "Invalid email address" });
       return;
     }
 
     if (!form.password) {
-      setErrors({ ...errors, password: 'Password is required' });
+      setErrors({ ...errors, password: "Password is required" });
       return;
     }
-
 
     setLoading(true);
 
     try {
-      await login(form.email, form.password, stayLoggedIn);
+      // your backend should accept `identifier` (either email or phone)
+      await login(form.identifier, form.password, stayLoggedIn);
       navigate("/");
     } catch (err: unknown) {
       if (isApiError(err)) {
         const message = err.response?.data?.message || "An error occurred";
-        console.log(err.response);
         setErrors({
-          email: err.response?.data?.errors?.email?.[0] || " ",
+          identifier: err.response?.data?.errors?.identifier?.[0] || " ",
           password: err.response?.data?.errors?.password?.[0] || " ",
         });
         toast.error(message);
@@ -83,27 +90,21 @@ export default function SignInForm() {
 
           <Divider text="Or" />
 
-          <div className="mb-2 sm:mb-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
-            </p>
-          </div>
-
           <form onSubmit={handleSubmit}>
             <div className="space-y-6">
               <div>
                 <Label>
-                  Email <span className="text-error-500">*</span>
+                  Email or Mobile <span className="text-error-500">*</span>
                 </Label>
                 <Input
-                  type="email"
-                  name="email"
-                  value={form.email}
+                  type="text"
+                  name="identifier"
+                  value={form.identifier}
                   onChange={handleChange}
-                  placeholder="Email"
-                  autoComplete="email"
-                  error={!!errors.email}
-                  hint={errors.email}
+                  placeholder="Enter email or mobile"
+                  autoComplete="username"
+                  error={!!errors.identifier}
+                  hint={errors.identifier}
                 />
               </div>
               <div>

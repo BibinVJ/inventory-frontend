@@ -36,8 +36,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [fetchProfile]);
 
   const login = useCallback(
-    async (email: string, password: string, stayLoggedIn: boolean) => {
-      const data = await loginService(email, password);
+    async (identifier: string, password: string, stayLoggedIn: boolean) => {
+      const data = await loginService(identifier, password);
       storeUser(data, stayLoggedIn);
       api.defaults.headers.common[
         "Authorization"

@@ -3,7 +3,7 @@ import { User } from './User';
 export interface AuthContextType {
   user: User | null;
   login: (
-    email: string,
+    identifier: string,
     password: string,
     stayLoggedIn: boolean
   ) => Promise<User>;

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - beta
+      - staging
 
 jobs:
   deploy-frontend:
@@ -28,7 +28,7 @@ jobs:
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             echo "${{ secrets.FRONTEND_ENV_MAIN }}" > .env
           else
-            echo "${{ secrets.FRONTEND_ENV_BETA }}" > .env
+            echo "${{ secrets.FRONTEND_ENV_STAGING }}" > .env
           fi
 
       - name: Build Frontend
@@ -41,7 +41,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: 'dist/*'
-          target: ${{ github.ref == 'refs/heads/main' && '/var/www/inventory/production/frontend' || '/var/www/inventory/beta/frontend' }}
+          target: ${{ github.ref == 'refs/heads/main' && '/var/www/inventory/production/frontend' || '/var/www/inventory/staging/frontend' }}
 
       - name: Post-Deploy Notification
         uses: appleboy/ssh-action@v1.0.0

@@ -27,7 +27,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [type, setType] = useState('product');
-  const [selling_price, setSellingPrice] = useState(0);
+  const [selling_price, setSellingPrice] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [errors, setErrors] = useState({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
@@ -65,7 +65,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
     setDescription('');
     setIsActive(true);
     setType('product');
-    setSellingPrice(0);
+    setSellingPrice('');
     setErrors({ sku: '', name: '', category_id: '', unit_id: '', type: '', selling_price: '' });
   };
 
@@ -111,7 +111,7 @@ export default function AddItemModal({ isOpen, onClose, onItemAdded }: Props) {
         description,
         is_active: isActive,
         type,
-        selling_price
+        selling_price: Number(selling_price)
       });
       onItemAdded();
       toast.success('Item added successfully');

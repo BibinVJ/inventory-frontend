@@ -85,6 +85,7 @@ export default function ViewSale() {
                 </Badge>
               </strong></p>
               <p className="dark:text-gray-400">Payment Method: <strong>{sale.payment_method}</strong></p>
+              <p className="dark:text-gray-400">Note: <strong>{sale.note}</strong></p>
             </div>
           </div>
 
